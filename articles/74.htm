@@ -1,0 +1,179 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Разное. Алгоритм "бегущих кубиков" для полигонизации изоповерхностей.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b7.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+РАЗНОЕ<br>7.4. Алгоритм "бегущих кубиков" для полигонизации изоповерхностей
+
+<!-- Article -->
+
+<p>Сооветствующий английский термин - marching cubes algorithm; приведен здесь,
+так сказать, just to avoid any confusion. Алгоритм предназначен для быстрого
+построения полигональной модели изоповерхности трехмерного скалярного поля,
+заданного значениями на равномерной сетке. Выражаясь менее академичным и,
+надеюсь, более понятным языком, этот алгоритм нужен для быстрого построения
+набора треугольных граней, достаточно хорошо приближающего изоповерхность,
+то есть такую поверхность, на которой определенная функция равна какой-то
+константе - изоуровню. Например, сфера радиуса 1 с центром в нуле - это
+изоповерхность функции f=1/(x*x+y*y+z*z) для изоуровня 1. Т.н. "3D капли",
+столь любимые ныне, тоже являются изоповерхностью, правда, немного более
+сложной функции (да, функция задана в трехмерном пространстве):
+
+<pre class=formula>
+     n
+f = sum c[i]/((x[i]-x)*(x[i]-x)+(y[i]-y)*(y[i]-y)+(z[i]-z)*(z[i]-z)),
+    i=1
+</pre>
+
+<p>где
+
+<p><table width=480 cellspacing=0 cellpadding=0 border=0 align=center>
+<tr><td><p class=expression>n</td><td>количество источников поля (капелек)</td></tr>
+<tr><td><p class=expression>c[i]</td><td>интенсивность каждого источника (радиус капельки)</td></tr>
+<tr><td><p class=expression>x[i], y[i], z[i]</td><td>координаты каждого источника (центра капельки)</td></tr>
+</table>
+
+<p>Работает алгоритм следующим образом.
+
+<p>Рассматриваем какой-то параллелипипед, внутри которого заведомо находится
+изоповерхность (или та ее часть, которую мы хотим нарисовать). Разбиваем
+его сеткой, ну, как бы разрезаем его на несколько меньших параллелипипедов,
+и считаем значения функции (поля) в узлах сетки, то есть вершинах этих самых
+маленьких параллелипипедов. Для большей ясности можно заменить длинное слово
+"параллелипипед" на слово "куб" и представить себе кубик Рубика. Теперь
+проходим по всем кубикам (дальше я буду везде использовать слово "кубик",
+надоело "параллелипипед" писать). Смотрим на значения функции в вершинах
+кубика. Если все они больше (или меньше) изоуровня - значит, кубик находится
+целиком над (или под) изоповерхностью, внутри этого кубика поверхности нет и
+мы его просто отбрасываем. Если же часть больше, а часть меньше, то некоторые
+ребра кубика пересекаются с изоповерхностью. Линейной интерполяцией приближаем
+эти точки пересечения и в зависимости от того, какие вершины находятся над
+изоповерхностью, а какие под, генерируем несколько треугольных граней. Все
+вершины этих граней - это как раз точки пересечения поверхности с ребрами.
+Как генерировать грани и пересечения каких ребер с поверхностью считать,
+смотрим по таблице, это зависит лишь от того, какие вершины находятся над
+поверхностью, а какие - под. Вершин восемь, состояний два - над и под. Это
+дает нам 256 возможных расположений, так что таблица не такая уж и большая.
+Индекс в таблице тоже генерируется совсем просто: если вершина находится
+над поверхностью, устанавливаем соответствующий этой вершине бит индекса,
+иначе - сбрасываем.
+
+<p>Вот простенький пример.
+
+<p><center><img src="illu/illu74a.gif" width=180 height=180 alt="рисунок (illu/illu74a.gif)"></center>
+
+<p>Пусть точка 6 находится под поверхностью, остальные - над. Тогда поверхность
+проходит через точки (*), приближаем их линейной интерполяцией и проводим
+через них треугольную грань. Какие ребра пересекаются с поверхностью, какие
+точки пересечния и как соединять - узнаем из таблиц по индексу; в данном
+случае индекс равен 11011111b=0DFh (установлены все биты, кроме 6го).
+
+<p>Алгоритм по шагам:
+
+<ul>
+<li><p>посчитать значения функции в узлах сетки (вершинах кубиков)
+
+<li><p>для каждого кубика:
+
+<ul>
+<li><p>посчитать индекс этого кубика в таблице. Каждый бит соответствует
+какой-то из вершин, если в ней значение функции больше изоуровня,
+то надо установить этот бит, иначе - сбросить
+
+<li><p>взять из таблицы по индексу кубика слово, каждый бит в котором
+определяет, пересекает ли соответствующее ему (биту) ребро кубика
+изоповерхность, или нет. Если да, то посчитать (простая линейная
+интерполяция между соответствующими ребру вершинами) координаты
+точки пересечения
+
+<li><p>взять из таблицы по индексу кубика число генерируемых граней и
+собственно тройки номеров ребер, (уже посчитанные) пересечения
+которых с изоповерхностью и будут вершинами нужных граней
+</ul></ul>
+
+<p>Неоднократно упоминавшиеся магические таблицы приведены в примерчике, там
+же приведен кусок кода, который довольно легко переделть под свой engine.
+Пример взят с <a href="http://www.mhri.edu.au/~pdb/modelling/polygonise">http://www.mhri.edu.au/~pdb/modelling/polygonise</a>, сам по себе
+он компилироваться НЕ будет, но все там написано правильно и никаких ошибок
+в таблицах нет (так что ищите ошибку в своем коде).
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="73.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="75.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

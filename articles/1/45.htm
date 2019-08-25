@@ -1,0 +1,151 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Текстурирование. Билинейная фильтрация текстур.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b4.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+ТЕКСТУРИРОВАНИЕ<br>4.5. Билинейная фильтрация текстур
+
+<!-- Article -->
+
+<p>Да-да, это именно тот метод, с помощью которого смазывают текстуры всякие
+ускорители типа 3Dfx. Итак, пусть у нас есть какая-то текстура. Текстура у
+нас - это 2D картинка, а 2D картинка в свою очередь - набор замеров цвета
+через какие-то промежутки. В реальной же жизни цвет не меняется скачком
+через каждый, например, миллиметр, а является какой-то непрерывной функцией
+от положения, причем меняется довольно плавно. При обычном текстурировании
+мы получаем координаты в текстуре, округляем их до ближайшего целого числа
+и выбираем нужный цвет из текстуры. То есть мы как бы берем значение цвета
+в самой близкой к рисуемой точке сетки замеров цвета, поэтому у нас цвет
+резко меняется, оставаясь непрерывным между узлами сетки, поэтому возникает
+эффект больших квадратов.
+
+<p>При билинейной фильтрации цвет всего-навсего линейно интерполируется между
+узлами сетки замеров. То есть. Пусть в текущей точке у нас получились
+координаты текстуры u, v - какие-то нецелые, вообще говоря, числа. Тогда
+по целым частям u, v определяется, между какими узлами сетки (если угодно,
+между какими пикселами текстуры) находится наша точка, а по дробным - как
+близко она находится к каждому из узлов. Вот картинка.
+
+<p><center><img src="illu/illu45a.gif" width=180 height=180 alt="рисунок (illu/illu45a.gif)"></center>
+
+<p>Здесь 1, 2, 3, 4 - "окружающие" точку пикселы текстуры (они же узлы сетки
+замера цвета). Пусть iu, iv - целые части координат текстуры точки u, v; fu,
+fv - дробные части. Тогда 1, 2, 3, 4 имеют координаты в текстуре (iu,iv),
+(iu+1,iv), (iu,iv+1), (iu+1,iv+1). Проинтерполируем какую-то компоненту
+цвета (R, G или B) по прямым 1-3 и 2-4:
+
+<p class=expression>a.c = 1.c + (3.c - 1.c) * fv,<br>
+b.c = 2.c + (4.c - 2.c) * fv,<br>
+
+<p>то есть
+
+<p class=expression>a.c = c[iu][iv] + (c[iu][iv+1] - c[iu][iv]) * fv,<br>
+b.c = c[iu+1][iv] + (c[iu+1][iv+1] - c[iu+1][iv]) * fv,<br>
+
+<p>Теперь проинтерполируем цвет по прямой ab в нашей точке:
+
+<p class=expression>c = a.c + b.c * fu,<br>
+
+<p>Проинтерполировав по этой формуле каждую компоненту цвета, получим наконец
+готовый результат - цвет точки, но уже с учетом билинейной фильтрации.
+
+<p>Здесь у нас получилось по три умножения на компоненту. То есть в сумме девять
+умножений на пиксел. Можно, конечно, честно считать по этим формулам, делая
+девять умножений для каждого пиксела. Но можно заменить все умножения на
+выборки по таблице. u, v обычно - это fixedpoint; fu, fv - тоже (кстати, в
+случае с fixedpoint целые и дробные части вычисляются ровно одним and'ом).
+Пусть мы используем 24-битный цвет и 16:16 fixedpoint; тогда одна компонента
+цвета занимает 8 бит, а дробную часть можно одним сдвигом перевести в 24:8
+fixedpoint. Получаем 256 возможных значений для любой компоненты цвета и 256
+возможных значений для дробной части, то есть - табличка 256x256. Если цвет
+15/16-битный, или используется более грубое (скажем, до пяти бит) округление
+дробной части, то табличка становится еще меньше. Памяти, конечно, не жалко,
+но кэш-память пока не резиновая, так что чем меньше lookup-таблица, тем оно
+лучше для скорости. Вот и все.
+
+<p>Осталось только упомянуть, что лучше занести в табличку не байты, а слова,
+для данного примера это будет 8:8 fixedpoint, и складывать все результаты
+тоже как слова, а потом сдвигом переводить обратно в целые числа. Иначе
+(особенно в случае 15/16-битных режимов) будет заметен небольшой шум на
+текстуре, появляющийся из-за ошибок округления.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="44.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="46.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

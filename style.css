@@ -1,0 +1,36 @@
+body, td, p	{	font-family:	sans-serif, verdana, arial, helvetica;
+			font-size:	13px		}
+
+A:link		{	color:		#3333CC		}
+
+A:visited	{	color:		#883388		}
+
+A:active	{	color:		#FF3333		}
+
+p.title		{	font-family:	impact,  times, sans-serif;
+			color:		#5E5EA5;
+			margin-bottom:	-10px;
+			font-size:	24px		}
+
+p.pagetitle	{	font-family:	impact,  times, sans-serif;
+			color:		#9B9BCC;
+			font-size:	23px		}
+
+p.linkinfo	{	text-indent:	-20px;
+			margin-left:	20px;
+			margin-top:	8px		}
+
+p.navy		{	font-size:	11px		}
+
+p.expression	{	margin-left:	20px;
+			text-align:	left		}
+
+pre		{	font-family:	monospace, courier;
+			font-size:	12px		}
+
+pre.source	{	margin-left:	20px;
+			color:		#5E5EA5		}
+
+pre.sourceu	{	color:		#5E5EA5		}
+
+pre.formula	{	margin-left:	20px		}

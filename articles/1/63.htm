@@ -1,0 +1,202 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Оптимизация. Использование инструкций MMX.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b6.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+ОПТИМИЗАЦИЯ<br>6.3. Использование инструкций MMX
+
+<!-- Article -->
+
+<p>Если вкратце (а по-другому и не выйдет) с помощью MMX можно довольно неплохо
+разогнать некоторые медленные операции - например, сделать RGB-освещение. Или
+текстурирование с билинейной фильтрацией. Здесь я только продемонстрирую эти
+два примера; всяческие дальнейшие применения - на откуп читателю.
+
+<p>Пример внутреннего цикла с освещением через инструкции MMX:
+
+<pre class=source>
+    mov   eax,u             ; 24:8 fixedpoint
+    mov   ebx,v             ; 24:8 fixedpoint
+    mov   ecx,length
+    xor   edx,edx
+    mov   esi,texture
+    mov   edi,outputbuffer
+    movq  mm1,light         ; RGB-освещенность, qword
+                            ; (4 штуки 0:9 fixedpoint)
+    movq  mm2,delta_light   ; изменение освещенности
+inner:
+    mov        dl,ah           ; dl = (u >> 8)
+    add        eax,du          ; u += du
+    mov        dh,bh           ; dh = (v >> 8)
+    add        ebx,dv          ; v += dv
+    movd       mm0,[esi+4*edx] ; грузим пиксел
+    punpcklbw  mm0,mm0         ; распаковываем пиксел
+    psrlw      mm0,1           ; для того, чтобы были
+                               ; беззнаковые числа
+    pmulhw     mm0,mm1         ; умножаем RGB на RGB-освещенность
+    add        edi,4
+    dec        ecx
+    packuswb   mm0,mm0         ; пакуем пиксел обратно
+    paddw      mm1,mm2         ; light += delta_light
+    movd       [edi-4],mm0
+    jnz        inner
+</pre>
+
+<p>Этот цикл дает после некоторой дальнейшей оптимизации 7 тактов на
+пиксел - зато с текстурированием и полноценным RGB-освещением. Собственно
+освещение занимает лишь 2 такта. Не очень плохо.
+
+<p>Пример внутреннего цикла с билинейной фильтрацией через инструкции MMX:
+
+<pre class=source>
+    mov   eax,u        ; 24:8 fixedpoint
+    mov   ebx,v        ; 24:8 fixedpoint
+    mov   ebp,length
+    xor   ecx,ecx
+    xor   edx,edx
+    mov   esi,texture
+    mov   edi,outputbuffer
+inner:
+    mov        dl,ah           ; dl = (u >> 8)
+    add        eax,du          ; u += du
+    mov        dh,bh           ; dh = (v >> 8)
+    add        ebx,dv          ; v += dv
+    mov        cl,al           ; ecx = (u & 0xFF) = fu - дробная
+                               ; часть u
+    movd       mm0,[esi+4*edx] ; грузим пикселы
+    movd       mm1,[esi+4*edx+4]
+    movd       mm2,[esi+4*edx+4*256]
+    movd       mm3,[esi+4*edx+4*257]
+    punpcklbw  mm0,mm0         ; распаковываем пикселы
+    punpcklbw  mm1,mm1
+    punpcklbw  mm2,mm2
+    punpcklbw  mm3,mm3
+    psrlw      mm0,1           ; для того, чтобы были беззнаковые
+    psrlw      mm1,1           ; числа и pmulhw (знаковое
+    psrlw      mm2,1           ; умножение) работало нормально
+    psrlw      mm3,1
+    psubw      mm1,mm0         ; mm1 = tex[v+1][u]-tex[v][u]
+    psubw      mm3,mm2         ; mm3 = tex[v+1][u+1]-tex[v][u+1]
+    pmulhw     mm1,tab[8*ecx]  ; mm1 *= fu
+    pmulhw     mm3,tab[8*ecx]  ; mm3 *= fu
+    add        esi,4
+    add        edi,4
+    psllw      mm1,7           ; корректируем результат умножения
+    psllw      mm3,7
+    paddsw     mm0,mm1         ; mm0 = tex[v][u] + mm1
+    paddsw     mm2,mm3         ; mm2 = tex[v][u+1] + mm3
+    mov        cl,bl           ; ecx = (v & 0xFF) = fv - дробная
+                               ; часть v
+    psubw      mm2,mm0         ; mm2 -= mm0
+    pmulhw     mm2,tab[8*ecx]  ; mm2 *= fv
+    psrlw      mm0,7           ; корректируем результат умножения
+    paddsw     mm0,mm2         ; mm0 += mm2 - отфильтрованное
+                               ; значение
+    packuswb   mm0,mm0         ; пакуем пиксел
+    movd       [edi-4],mm0     ; записываем его
+    dec        ebp
+    jnz        inner
+</pre>
+
+<p>Отдельного упоминания и разъяснение требует табличка tab. Это просто табличка
+дробных частей в готовом для MMX-умножения виде:
+
+<pre class=source>
+tab label      qword
+    dw         0,0,0,0
+    dw         1,1,1,1
+    dw         2,2,2,2
+    ; ...
+    dw         255,255,255,255
+</pre>
+
+<p>То есть в данном примере tab[8*ecx] = [cl, cl, cl, cl] - как раз готовая для
+использования в MMX-инструкциях дробная часть.
+
+<p>Здесь получается уже довольно приличное количество тактов на пиксел, порядка
+двадцати. Но несмотря на это, вышеприведенный цикл уронил fps на моей любимой
+тестовой сцене всего лишь в 1.5 раза по сравнению с обычным текстурированием.
+Тоже не очень плохо. В общем, успехов в использовании. Только не забывайте
+включать поддержку не-MMX режима для тех, у кого MMX нет, и, соответственно,
+детектор наличия MMX-инструкций.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="62.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="64.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

@@ -1,0 +1,150 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Удаление невидимых частей. Порталы.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b3.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+УДАЛЕНИЕ НЕВИДИМЫХ ЧАСТЕЙ<br>3.4. Порталы
+
+<!-- Article -->
+
+<p>Этот метод предназначен для т.н. indoor environments - в буквальном переводе
+"комнатная среда"; это как бы внутренность какого-то здания. В качестве
+примера могут служить Doom, Quake.
+
+<p>В этом случае сцена составляется из комнат. Комнаты связаны друг с другом
+какими-то проходами - дверями, окнами, чем угодно. На каждый такой проход
+вешается обычный полигон, называемый порталом. Для отрисовки сцены достаточно
+нарисовать текущую комнату вместе с тем, что из нее видно. Но то, что из нее
+видно, может быть видно *только* через порталы.
+
+<p>Таким образом, для отрисовки всей сцены мы просто берем и рисуем текущую
+комнату, используя любые методы удаления невидимых частей (например, алгоритм
+художника и отброс нелицевых граней). А если в процессе отрисовки нам
+встречается полигон, помеченный как портал, то мы рисуем комнату, которую
+видно через этот портал, причем отсекаем ее уже по проекции этого портала.
+
+<p>Как обычно, кусок кода для уяснения:
+
+<pre class=source>
+// ...
+void drawRoom(int roomID, polygon *clipArea) {
+  int i;
+
+  for (i = 0; i < rooms[roomID].numFaces; i++)
+    drawFace(&rooms[roomID].face[i], clipArea);
+}
+
+void drawFace(polygon *face, polygon *clipArea) {
+  polygon *newClipArea;
+
+  if (face->isPortal) {
+    if (isVisible(face, clipArea) {
+      newClipArea = clipPolygon(face, clipArea);
+      drawRoom(face->destinationRoom, newClipArea);
+    }
+  } else drawClippedPolygon(face, clipArea);
+}
+
+// ...
+
+drawRoom(currentRoom, fullScreen);
+
+// ...
+</pre>
+
+<p>Здесь функция isVisible(face, clipArea) возвращает false, если грань face и
+область отсечения clipArea не пересекаются; функция clipPolygon возвращает
+пересечение полигонов face и clipArea (то есть отсекает face в clipArea и
+наоборот); fullScreen - полигон размером с экран (или любую нужную область
+отрисовки).
+
+<p>В природе есть Alpha 2 - готовый engine, использующий порталы и написанный на
+TMT Pascal, причем, что приятно, доступный в исходниках. Скачать его когда-то
+было можно с <a href="http://www.geocities.com/CapeCanaveral/5402/">
+http://www.geocities.com/CapeCanaveral/5402</a>. Есть, впрочем,
+надежда, что найти этот engine особых проблем не составит.
+
+<p>Осталось упомянуть, что несмотря на то, что в изложенной форме метод и требует
+возможности отрисовки произвольной грани, отсеченной в произвольную грань,
+можно обойтись и отсечением по bounding box проекции портала.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="33.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="35.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

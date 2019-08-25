@@ -1,0 +1,456 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Разное. Формат 3DS-файла.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b7.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+РАЗНОЕ<br>7.5. Формат 3DS-файла
+
+<!-- Article -->
+
+<p>Основная идея вот: файл 3DS состоит из блоков (chunks), каждый из которых
+содержит какие-то полезные данные и, возможно, подблоки. Большинство блоков
+содержит либо данные, либо подблоки, хотя есть и смешанные блоки. Общий
+формат каждого блока такой:
+
+<p><table cellpadding=0 cellspacing=0 border=0 align=center><td bgcolor=#5E5EA5>
+<p><table cellspacing=1 cellpadding=4 border=0 align=center>
+<tr><td align=right bgcolor=white>смещение</td><td bgcolor=white>длина</td><td bgcolor=white>данные</td></tr>
+<tr><td align=right bgcolor=white>0</td><td align=right bgcolor=white>2</td><td bgcolor=white>идентификатор типа блока, chunk_id</td></tr>
+<tr><td align=right bgcolor=white>2</td><td align=right bgcolor=white>4</td><td bgcolor=white>длина блока, chunk_len</td></tr>
+<tr><td align=right bgcolor=white>4</td><td align=right bgcolor=white>chunk_len</td><td bgcolor=white>данные или подблоки (в зависимости от chunk_id)</td></tr>
+</table>
+
+</td></table>
+
+<p>В качестве относительно полного описания конкретного содержимого блоков
+я бы порекомендовал следующие вещи:
+
+<ul>
+<li><p>исходники 3DS reader от MRI/Doomsday, читаются они просто великолепно.
+Скачать можно на<br> <a href="ftp://ftp.cdrom.com/pub/demos/code/3ds/3dsrdr13.zip">ftp://ftp.cdrom.com/pub/demos/code/3ds/3dsrdr13.zip</a>;
+
+<li><p>3dsinfo.txt от digisnap.
+</ul>
+
+<p>Здесь я приведу лишь частичное описание, достаточное, впрочем, для того,
+чтобы прочитать из 3DS-файла 3D сцену и информацию о ее (сцены) анимации.
+
+<p>Итак, список идентификаторов типов нужных нам для этого блоков:
+
+<pre class=source>
+CHUNK_MAIN                = 0x4D4D; // [-] сцена
+  CHUNK_OBJMESH           = 0x3D3D; // [-] всяческие объекты
+    CHUNK_OBJBLOCK        = 0x4000; // [+] объект
+      CHUNK_TRIMESH       = 0x4100; // [-] trimesh-объект
+        CHUNK_VERTLIST    = 0x4110; // [+] список вершин
+        CHUNK_FACELIST    = 0x4120; // [+] список граней
+        CHUNK_FACEMAT     = 0x4130; // [+] материалы граней
+        CHUNK_MAPLIST     = 0x4140; // [+] текстурные координаты
+        CHUNK_TRMATRIX    = 0x4160; // [+] матрица перевода
+      CHUNK_CAMERA        = 0x4700; // [+] объект-камера
+  CHUNK_MATERIAL          = 0xAFFF; // [-] материал
+    CHUNK_MATNAME         = 0xA000; // [+] название материала
+    CHUNK_TEXTURE         = 0xA200; // [-] текстура материала
+      CHUNK_MAPFILE       = 0xA300; // [+] имя файла текстуры
+ HUNK_KEYFRAMER           = 0xB000; // [-] информация об анимации
+  CHUNK_TRACKINFO         = 0xB002; // [-] поведение объекта
+    CHUNK_TRACKOBJNAME    = 0xB010; // [+] название этого объекта
+    CHUNK_TRACKPIVOT      = 0xB013; // [+] центр вращения объекта
+    CHUNK_TRACKPOS        = 0xB020; // [+] траектория объекта
+    CHUNK_TRACKROTATE     = 0xB021; // [+] траектория вращения 
+                                    //     объекта
+  CHUNK_TRACKCAMERA       = 0xB003; // [-] поведение камеры
+    CHUNK_TRACKFOV        = 0xB023; // [+] поведение FOV камеры
+    CHUNK_TRACKROLL       = 0xB024; // [+] поведение roll камеры
+  CHUNK_TRACKCAMTGT       = 0xB004; // [-] поведение "цели" камеры
+</pre>
+
+<p>Конкретные данные содержат лишь блоки, отмеченные плюсом, остальные блоки
+состоят лишь из подблоков и их нам надо различать лишь потому, что нужные
+нам блоки данных - подблоки этих остальных. То есть, скажем, CHUNK_OBJMESH
+нам надо знать из-за того, что каждый объект в сцене описывается блоком
+CHUNK_OBJBLOCK, который появляется только как подблок CHUNK_OBJMESH, и
+просто игнорировать весь CHUNK_OBJMESH из-за этого нельзя. Кроме того, они
+задают структуру - например, все данные, что относятся к текущему блоку
+CHUNK_OBJBLOCK, относятся к текущему объекту, а подблоки этого блока уже
+могут быть разбросаны как угодно.
+
+<p>А теперь - относительно полное описание того, какие данные содержатся в
+каждом из блоков. Будут использоваться следующие обозначения:
+
+<p><table width=480 cellspacing=0 cellpadding=0 border=0 align=center>
+<tr><td><p class=expression>char[]</td><td>ASCIIZ-строка (ASCII-строка, оканчивающаяся нулем)</td></tr>
+<tr><td><p class=expression>byte  </td><td>8-битное беззнаковое целое число</td></tr>
+<tr><td><p class=expression>word  </td><td>16-битное беззнаковое целое число</td></tr>
+<tr><td><p class=expression>dword </td><td>32-битное целое число</td></tr>
+<tr><td><p class=expression>float </td><td>32-битное число с плавающей запятой</td></tr>
+<tr><td><p class=expression>vector</td><td>float x,z,y</td></tr>
+</table>
+
+<p>Здесь (в самой последней строчке) опечатки нет! В файле 3DS везде изменен
+порядок следования y и z; то есть в файле данных ось y смотрит вглубь экрана,
+а ось z - вверх. Несмотря на то, что в самой 3D Studio ось y смотрит как раз
+вверх, а z - вдаль.
+
+<p><table width=480 cellspacing=0 cellpadding=0 border=0 align=center>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_VERTLIST
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+список вершин текущего объекта
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>
+word num;             // число вершин
+vector vertices[num]; // координаты каждой из вершин
+</pre>
+</td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_FACELIST
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+список граней текущего объекта
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>
+word num;     // число граней
+struct {      //
+  word v0;    // номер первой вершины грани
+  word v1;    // номер второй вершины грани
+  word v2;    // номер третьей вершины грани
+  word flags; // флаги грани
+} faces[num]; // собственно список граней
+</pre>
+</td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_FACEMAT
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+название материала и список тех граней объекта, которым назначен
+этот материал; таких блоков может быть несколько (грани с разными
+материалами в одном объекте), а может вообще не быть, если объекту
+материалы вообще не назначены (нетекстурированный объект)
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>
+char name[];         // название материала
+word num;            // число граней из этого материала
+word face_nums[num]; // список номеров граней из этого 
+                     // материала
+</pre>
+</td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_MAPLIST
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+текстурные координаты вершин текущего объекта
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>
+word num;         // число вершин
+struct {          //
+  float u;        // координата текстуры U
+                  // (по горизонтали)
+  float v;        // координата текстуры V
+                  // (по вертикали)
+} texcoords[num]; // собственно список текстурных
+                  // координат
+</pre>
+
+<p>Текстурные координаты задаются в диапазоне 0..1. Точка с U=0, V=0 - левый
+верхний край текстуры; U=1, V=1 - правый нижний; U=0.5, V=0.5 - центр
+текстуры.
+</td></tr>
+
+<tr><td><br></td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_TRMATRIX
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+содержит матрицу перевода объекта в некое абстрактное начальное
+состояние; в то, что было первоначально смоделировано. Требуется
+для корректного отображения анимации: дело в том, что все объекты
+в файле хранятся по состоянию на нулевой кадр, а анимация записана
+по отношению к "начальным" моделям. Т.е. при отображений нулевого
+кадра эта матрица не нужна, а при отображении всего набора кадров
+надо будет сначала перевести объекты в "начальное" состояние с
+помощью этой самой матрицы перевода и применять все преобразования
+(перемещения, повороты, etc) именно к "начальным" объектам.
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>
+float rotmatrix[3][3]; // матрица поворота
+vector offset;         // смещение начального объекта
+</pre>
+
+<p>Для перевода объекта в "начальное" состояние надо сначала сдвинуть его
+назад, то есть на вектор -offset (НЕ на offset), а потом применить матрицу
+поворота rotmatr. Матрица записана построчно. Не забудьте - в ней y и z
+тоже везде обменены местами!
+</td><tr>
+
+<tr><td><br></td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_MATNAME
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+название материала
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>char[] name; // название материала</pre>
+</td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_MAPFILE
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+имя файла с текстурой
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>char[] filename; // имя файла с текстурой</pre>
+</td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_TRACKOBJNAME
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+название объекта, информация о поведении которого задается в
+текущем блоке CHUNK_TRACKINFO
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>
+char[] name;   // название объекта
+word flags[2]; // флаги
+word parent;   // номер объекта-родителя
+</pre>
+
+<p>Поле parent используется для построения иерархической структуры; дерева
+объектов. Каждому объекту присваивается его порядковый номер при следовании
+в файле, поле parent выставляется в -1, если у данного объекта нет родителя.
+Вот пример.
+
+<pre class=formula>
+ объект | номер | parent
+--------+-------+--------
+    A   |   0   |   -1
+    B   |   1   |    0                    A
+    C   |   2   |    1          +---------+----+
+    D   |   3   |    2          B         K    N
+    E   |   4   |    1     +----+----+    +    +
+    F   |   5   |    4     C    E    H    L    O
+    G   |   6   |    5     +    +    +    +    +
+    H   |   7   |    1     D    F    I    M    P
+    I   |   8   |    7          +    +
+    J   |   9   |    8          G    J
+    K   |  10   |    0
+    L   |  11   |   10
+    M   |  12   |   11
+    N   |  13   |    0
+    O   |  14   |   13
+    P   |  15   |   14
+</pre>
+
+<p>Насколько я понял, дерево используется следующим образом: если к какому-то
+узлу дерева применяется преобразование, то оно же автоматически применяется
+и ко всем узлам, "растущим" из этого. То есть, если объект B в нашем примере
+есть рука, а объекты C, D, E, F, G, H, I, J - пальцы, то при повороте руки
+пальцы должны повернуться автоматически, вместе с рукой. В результате блок
+CHUNK_TRACKROTATE для пальцев может быть пустым, а пальцы будут вращаться
+вместе с рукой.
+</td></tr>
+
+<tr><td><br></td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_TRACKPIVOT
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+координаты центра вращения объекта
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>vector pivotpoint; // координаты центра вращения</pre>
+
+<p>Центр вращения - это как раз та точка "начального" объекта, через которую
+надо будет провести ось вращения, задающуюся в блоке CHUNK_TRACKROTATE.
+</td></tr>
+
+<tr><td><br></td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_TRACKPOS
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+траектория объекта, заданная ключевыми значениями положения объекта
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>
+word flags;           // флаги
+byte unknown[8];      // <неизвестно>
+dword num;            // число ключевых значений
+struct {              //
+  dword frame;        // кадр данного ключевого значения
+  word splineflags;   // флаги сплайна
+  float[] splineinfo; // параметры сплайна (кол-во и тип
+                      // зависит от значения splineflags)
+  vector pos;         // положение объекта
+} keys[num];          // собственно ключевые значения
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_TRACKROTATE
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+траектория вращения объекта, заданная ключевыми значениями вектора
+направления оси вращения и угла поворота относительно этой оси
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>
+word flags;           // флаги
+byte unknown[8];      // <неизвестно>
+dword num;            // число ключевых значений
+struct {              //
+  dword frame;        // кадр данного ключевого значения
+  word splineflags;   // флаги сплайна
+  float[] splineinfo; // параметры сплайна (кол-во и тип
+                      // зависят от значения splineflags)
+  float angle;        // угол поворота (в радианах)
+  vector rotaxis;     // ось вращения
+} keys[num];          // собственно ключевые значения
+</pre>
+
+<p>Только самое первое ключевое значение задает абсолютный поворот. Все
+последующие задают "добавочный" поворот, который надо добавить ко всем,
+уже сделанным. То есть, во второй ключевой позиции мы последовательно
+применяем повороты, заданные первым и вторым ключом, в третьей - первым,
+вторым и третьим, и так далее.
+</td></tr>
+
+<tr><td><br></td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_TRACKCAMERA
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+траектория камеры, заданная ключевыми значениями положения, угла
+зрения, ориентации камеры
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<p>Состоит из подблоков CHUNK_TRACKOBJNAME, CHUNK_TRACKPOS, CHUNK_TRACKFOV,
+CHUNK_TRACKROLL и некоторых других, которые можно безболезненно игнорировать.
+</td></tr>
+
+<tr><td><br></td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_TRACKFOV
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+поведение FOV (угла зрения) камеры, заданное ключевыми значениями
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>
+word flags;           // флаги
+byte unknown[8];      // <неизвестно>
+dword num;            // число ключевых значений
+struct {              //
+  dword frame;        // кадр данного ключевого значения
+  word splineflags;   // флаги сплайна
+  float[] splineinfo; // параметры сплайна (кол-во и тип
+                      // зависят от значения splineflags)
+  float FOV;          // значение FOV
+} keys[num];          // собственно ключевые значения
+</pre>
+</td></tr>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_TRACKROLL
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+поведение roll (угла наклона) камеры, заданное ключевыми значениями
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<pre class=sourceu>
+word flags;           // флаги
+byte unknown[8];      // <неизвестно>
+dword num;            // число ключевых значений
+struct {              //
+  dword frame;        // кадр данного ключевого значения
+  word splineflags;   // флаги сплайна
+  float[] splineinfo; // параметры сплайна (кол-во и тип
+                      // зависят от значения splineflags)
+  float roll;         // значение roll
+} keys[num];          // собственно ключевые значения
+</pre>
+
+<tr><td><p class=expression>Блок: </td><td>CHUNK_TRACKCAMTGT
+</td></tr><tr><td valign=top><p class=expression>Данные: </td><td><div align=justify>
+траектория "цели" камеры (точки, куда камера смотрит), заданная
+ключевыми значениями положения
+</td></tr><tr><td valign=top><p class=expression>Формат: </td><td><div align=justify>
+<p>Состоит из подблоков CHUNK_TRACKOBJNAME, CHUNK_TRACKPOS и некоторых других,
+которые можно безболезненно игнорировать.
+</tr></td>
+
+</table>
+
+<p>Теперь к вопросу о сплайнах и их параметрах. Всего может быть до пяти разных
+параметров сплайна, появление каждого из них задается каким-то битом в
+поле splineflags:
+
+<ul>
+<li><p>установлен бит 0: следует параметр "tension"
+<li><p>установлен бит 1: следует параметр "continuity"
+<li><p>установлен бит 2: следует параметр "bias"
+<li><p>установлен бит 3: следует параметр "ease to"
+<li><p>установлен бит 4: следует параметр "ease from"
+</ul>
+
+<p>То есть при чтении флагов надо последовательно тестировать каждый бит и,
+если он установлен, читать соответствующий параметр; если не установлен,
+значит, параметр равен нулю. 3D Studio использует <a href="76.htm">сплайны&nbsp;Кочанека-Бартельса</a>
+(Kochanek-Bartels) для интерполяции положения и поворотов, при этом повороты
+вдобавок представляются в форме кватернионов, в ней же и интерполируются.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="74.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="76.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

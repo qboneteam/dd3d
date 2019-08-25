@@ -1,0 +1,140 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Удаление невидимых частей. Z-отсечение.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b3.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+УДАЛЕНИЕ НЕВИДИМЫХ ЧАСТЕЙ<br>3.5. Z-отсечение
+
+<!-- Article -->
+
+<p>Необходимость в этой процедуре возникает, когда, в конце концов, оказывается,
+что надо нарисовать грань, у которой часть вершин лежит перед камерой, а
+часть - за камерой. То есть грань, пересекающуюся с экраном. Сама по себе
+она правильно не нарисуется.
+
+<p>Поскольку камера видит только то, что перед ней находится, все те точки, для
+которых z < -dist, рисовать не надо. То есть, каждую грань надо обрезать
+плоскостью z = -dist. Принципиально различных случаев расположения грани
+относительно этой плоскости может быть всего четыре; когда перед камерой
+находятся соответственно 0, 1, 2 или 3 вершины. Первый и последний случаи
+тривиальны - если перед камерой находится 0 вершин, то грань просто не видна
+и рисовать ее не надо; если 3 вершины, то грань видна целиком и полностью и
+ее достаточно просто взять и нарисовать. Рассмотрим оставшиеся два случая.
+
+<p>Случай первый, когда перед камерой находится только одна вершина:
+
+<p><center><img src="illu/illu35a.gif" width=180 height=180 alt="рисунок (illu/illu35a.gif)"></center>
+
+<p>В этом случае перед камерой находится только треугольник CDE. Его и надо
+будет нарисовать вместо грани.
+
+<p>Случай второй, когда перед камерой находятся две вершины:
+
+<p><center><img src="illu/illu35b.gif" width=180 height=180 alt="рисунок (illu/illu35b.gif)"></center>
+
+<p>Здесь уже надо будет нарисовать трапецию DABE; она разбивается на два
+треугольника, DAB и DBE. Их и рисуем вместо грани.
+
+<p>Координаты и текстурные координаты для точек D, E считаются совсем просто:
+с одной стороны, D лежит на AC, с другой стороны, D.z = -dist. Для точки D
+как лежащей на AC любая величина t (вместо t подставляем x/y/u/v) считается
+следующим образом:
+
+<p class=expression>D.t = A.t + (C.t - A.t) * (D.z - A.z) / (C.z - A.z) =
+A.t + (C.t - A.t) * (-dist - A.z) / (C.z - A.z)<br>
+
+<p>Все это сводится в следующий алгоритм отрисовки грани:
+
+<p class=expression><ul>
+<li>выясняем, сколько вершин лежит перед камерой; то есть - какой из случаев мы имеем;
+<li>ставим точки A, B, C в соответствие с вершинами (то есть, если
+вершина v0 находится перед камерой, а вершины v1, v2 - нет, то
+имеем первый случай, где C = v0, A = v1, B = v2);
+<li>считаем, если нужно, координаты D, E;
+<li>рисуем (или добавляем в список отрисовки) полученные треугольники.
+</ul>
+
+Осталось только добавить, что обрезание на самом деле надо проводить не
+плокостью z = -dist, а плоскостью z = -dist + smallvalue, smallvalue > 0,
+чтобы избежать проблем при проецировании.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="34.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="36.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

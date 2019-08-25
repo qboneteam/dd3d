@@ -1,0 +1,262 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Текстурирование. Мипмэппинг.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b4.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+ТЕКСТУРИРОВАНИЕ<br>4.6. Мипмэппинг
+
+<!-- Article -->
+
+<p>Если полигон относительно сильно удален или повернут, так, что соседним
+пикселам на экране соотвествуют сильно разнесенные точки текстуры, то
+возникают всякие неприятные артефакты - можно считать, что потому, что при
+текстурировании мы выбираем лишь какую-то одну точку текстуры, а реально в
+экранный пиксел будет проецироваться несколько текселов (точек текстуры).
+Вообще идеальным методом было бы следующее: провести до пересечения с гранью
+3D-пирамиду с вершиной в камере и основанием-пикселом, выбрать все точки
+текстуры, попадающие в наш пиксел, и усреднить значения их цветов. Вот
+только вычислительные затраты на одну точку в этом случае окажутся просто
+фантастическими.
+
+<p>Поэтому для удаления артефактов используется значительно более простая вещь,
+а именно мипмэппинг. Идея, как обычно, проста. Для каждой текстуры заранее
+создается несколько ее копий уменьшенного размера (1/2, 1/4, и так далее),
+а далее при текстурировании используется либо сама текстура, либо подходящая
+уменьшенная копия. Памяти при этом расходуется на 25-33% больше, чем без
+мипмэппинга, но зато, вроде бы, увеличивается качество изображения.
+
+<p>Как создать уменьшенную в два раза копию текстуры? Здесь мы опишем три
+метода, два из них очевидны, третий позаимствован у Crystal Space. Методы
+расположены в порядке уменьшения скорости и увеличения качества уменьшенной
+текстуры.
+
+<p>Метод 1. Выкинуть все пикселы текстуры с нечетными координатами. Самый
+простой, самый быстрый, но дает не очень хорошо выглядящие результаты.
+
+<p>Метод 2. Оставить точки с четными координатами, в каждой точке усреднить
+значения цвета в этой точке и ее трех соседях (справа, снизу и справа-снизу).
+
+<p>Метод 3. Оставить точки с четными координатами, использовав в каждой точке
+фильтр, заданный вот такой матрицей:
+
+<pre class=formula>
+       [ 1 2 1 ]
+1/16 * [ 2 4 2 ]
+       [ 1 2 1 ]
+</pre>
+
+<p>В виде формул для каждой из компонент цвета точки уменьшенной в два раза
+копии текстуры эти методы запишутся, соответственно, так:
+
+<pre class=source>
+mip1[x][y] = tex[2*x][2*y];   // метод 1
+
+mip2[x][y] = (                // метод 2
+  tex[2*x  ][2*y  ] +
+  tex[2*x+1][2*y  ] +
+  tex[2*x  ][2*y+1] +
+  tex[2*x+1][2*y+1]) / 4;
+
+mip3[x][y] = (                // метод 3
+  1 * tex[2*x-1][2*y-1] +
+  2 * tex[2*x  ][2*y-1] +
+  1 * tex[2*x+1][2*y-1] +
+  2 * tex[2*x-1][2*y  ] +
+  4 * tex[2*x  ][2*y  ] +
+  2 * tex[2*x+1][2*y  ] +
+  1 * tex[2*x-1][2*y+1] +
+  2 * tex[2*x  ][2*y+1] +
+  1 * tex[2*x+1][2*y+1]) / 16;
+</pre>
+
+<p>Последовательно применяя любой из описанных методов, мы можем построить набор
+уменьшенных текстур. Остается выяснить, какую именно из них надо выбрать при
+текстурировании. Здесь опять будет описано два достаточно простых метода; а
+вообще, конечно, их можно придумать значительно больше.
+
+<p>Метод 1: полигональный мипмэппинг. В этом случае мы считаем площадь полигона
+на экране в пикселах и его же площадь в текстуре в текселах (последнюю обычно
+можно посчитать заранее), определяем по ним примерное количество пикселов,
+соотвествующих одному пикселу и выбираем нужный уровень уменьшения текстуры
+по следующей формуле:
+
+<pre class=source>miplevel = floor(log2(screenArea / textureArea) / 2);</pre>
+
+<p>здесь<br>
+
+<p><table width=480 cellpadding=0 cellspacing=0 border=0 align=center>
+<tr><td><p class=expression>screenArea&nbsp;</td><td>площадь грани на экране (в пикселах)</tr>
+<tr><td><p class=expression>textureArea&nbsp;</td><td>площадь грани в текстуре (в текселах)</tr>
+<tr><td><p class=expression>log2()&nbsp;</td><td>функция двоичного логарифма (для Watcom C стандартная)</tr>
+<tr><td valign=top><p class=expression>miplevel&nbsp;</td><td>уровень уменьшения; выбираемая текстура должна быть
+сжата по обеим осям в (2^miplevel) раз</tr>
+</table>
+
+<p>Поскольку бесконечное количество уменьшенных копий текстуры никто хранить
+не будет, да и увеличенные текстуры тоже обычно не хранят, а miplevel может
+получится любым действительным числом, надо, конечно, поставить заглушку:
+
+<pre class=source>
+miplevel = floor(log2(screenArea / textureArea) / 2);
+if (miplevel < 0) miplevel = 0;
+if (miplevel > MAXMIPLEVEL) miplevel = MAXMIPLEVEL;
+</pre>
+
+<p>screenArea и textureArea проще всего, по-моему, посчитать по формуле Герона
+для площади треугольника:
+
+<pre class=source>
+// a, b, c - стороны треугольника; p - периметр
+
+a = sqrt((v2.sx-v1.sx)*(v2.sx-v1.sx) + (v2.sy-v1.sy)*(v2.sy-v1.sy));
+b = sqrt((v3.sx-v1.sx)*(v3.sx-v1.sx) + (v3.sy-v1.sy)*(v3.sy-v1.sy));
+c = sqrt((v3.sx-v2.sx)*(v3.sx-v2.sx) + (v3.sy-v2.sy)*(v3.sy-v2.sy));
+p = (a + b + c);
+screenArea = sqrt(p * (p-a) * (p-b) * (p-c));
+
+a = sqrt((v2.u-v1.u)*(v2.u-v1.u) + (v2.v-v1.v)*(v2.v-v1.v));
+b = sqrt((v3.u-v1.u)*(v3.u-v1.u) + (v3.v-v1.v)*(v3.v-v1.v));
+c = sqrt((v3.u-v2.u)*(v3.u-v2.u) + (v3.v-v2.v)*(v3.v-v2.v));
+p = (a + b + c);
+textureArea = sqrt(p * (p-a) * (p-b) * (p-c));
+</pre>
+
+<p>Этот метод практически не требует вычислительных затрат, так как все операции
+проделываются один раз на грань. С другой стороны, здесь использутся один и
+тот же уровень уменьшения (он же уровень детализации, LOD, level of detail)
+для всего полигона, а разным пикселам может соответствовать разное количество
+текселов. Есть и более неприятное следствие - уровни уменьшения для двух
+соседних полигонов меняются скачком, а это не очень хорошо выглядит.
+
+<p>Метод 2: попиксельный мипмэппинг. В этом случае нужный уровень уменьшения
+считается для каждого пиксела и выбирается на основе максимального шага в
+текстуре из соответствующих переходу к соседнему пикселу:
+
+<pre class=source>
+textureStep = max(
+  sqrt(dudx * dudx + dvdx * dvdx),
+  sqrt(dudy * dudy + dvdy * dvdy));
+miplevel = floor(log2(textureStep));
+</pre>
+
+<p>Подобную операцию для каждого пиксела проводить, конечно, накладно. Но при
+аффинном текстурировании dudx, dvdx, dudy и dvdy постоянны для всех пикселов,
+так что попиксельный мэппинг становится полигонным, только с другой методикой
+расчета уровня уменьшения. Для перспективно-корректного же текстурирования
+dudx, dvdx, dudy и dvdy постоянны для всех пикселов одного кусочка (span'а),
+так что уровень уменьшения считается раз в несколько пикселов.
+
+<p>Впрочем, даже раз в несколько пикселов подобное (два корня и один логарифм)
+считать будет достаточно медленно. Поэтому займемся небольшой оптимизацией:
+во-первых, для скорости можно сделать упрощение и считать, что
+
+<pre class=source>textureStep = sqrt(dudx * dudx + dvdx * dvdx);</pre>
+
+<p>Далее, заметим, что log2(sqrt(x)) = log2(x) / 2, откуда
+
+<pre class=source>miplevel = floor(log2(dudx * dudx + dvdx * dvdx) / 2);</pre>
+
+<p>Осталась, практически, одна трудоемкая операция - взятие логарифма. Но и ее
+можно убрать. Дело в том, что числа с плавающей запятой (float'ы) как раз и
+хранятся в логарифмической форме, и floor(log2(x)) можно посчитать вот так:
+
+<pre class=source>
+float x;
+int floor_log2_x;
+
+x = 123456;
+floor_log2_x = ((*((int*)&x)) - (127 << 23)) >> 23; // чистый C
+floor_log2_x = (((int&)x) - (127 << 23)) >> 23;     // C++
+</pre>
+
+<p>Соответственно, floor(log2(sqrt(x))) = floor(log2(x) / 2) считаем как
+
+<pre class=source>
+miplevel = ((*((int*)&x)) - (127 << 23)) >> 24; // чистый C
+miplevel = (((int&)x) - (127 << 23)) >> 24;     // C++
+</pre>
+
+<p>Естественно, что этот трюк можно применить и в случае полигонного мипмэпинга
+для полного устранения всяческих медленых операций типа sqrt(), log2(). Вот,
+в общем-то, и все.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="45.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="51.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

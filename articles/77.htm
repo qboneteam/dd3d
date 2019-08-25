@@ -1,0 +1,361 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Разное. Кватернионы.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b7.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+РАЗНОЕ<br>7.7. Кватернионы
+
+<!-- Article -->
+
+<p>Кватернион, он же гиперкомплексное число, представляет собой набор четырех
+чисел. Иногда будет удобно представлять себе кватернион как 4D-вектор,
+иногда как набор четырех чисел, иногда как число и 3D-вектор, а иногда и
+как гиперкомплексное число с тремя мнимыми единицами i, j, k; таким образом,
+имеем следующие представления:
+
+<p class=expression>q = [x1,x2,x3,x4] = [scalar,(vector)] = [x1,(x2,x3,x4)] = x1+x2*i+x3*j+x4*k.<br>
+
+<p>Сложить или вычесть два кватерниона, а также умножить кватернион на число
+можно, как обычно, покомпонентно; с умножением ситуация более сложная.
+Умножение кватернионов должно в результате дать тоже кватернион, то есть
+конструкцию, содержащую лишь слагаемые вида r и r*l, где r - действительное
+число, а l - одна из мнимых единиц. Поэтому надо как-то определить операцию
+умножения для любых двух мнимых единиц. Определяется она так, что умножение
+получается некоммутативным, т.е. от перестановки мест множителей произведение
+меняется, и x*y != y*x. Поэтому умножение двух кватернионов приходится
+выполнять не по привычным правилам арифметики, а по следующим аксиомам:
+
+<pre class=formula>
+a*(b*c) = (a*b)*c,      (ассоциативность)
+(a+b)*c = a*c+b*c,      (транзитивность)
+a*(b+c) = a*b+a*c,      (транзитивность)
+a*1 = 1*a = a,          (существование единицы)
+a*0 = 0*a = 0,          (существование нуля)
+i*i = j*j = k*k = -1,   (свойство мнимых единиц)
+i*j = -j*i = k.         (связь между мнимыми единицами i, j, k)
+</pre>
+
+<p>Из этих правил, кстати, следует, что
+
+<pre class=formula>
+j*k = -k*j = i,
+k*i = -i*k = j,
+</pre>
+
+<p>и получается такая вот таблица умножения комплексных единиц (умножение
+действительных чисел между собой и на комплексные единицы действует по
+обычным правилам, так что все свойства кватернионов определяются, в общем,
+этой таблицей):
+
+<p>
+
+<table cellpadding=0 cellspacing=0 border=0 align=center><td bgcolor=#5E5EA5>
+
+<table width=240 cellspacing=1 cellpadding=4 border=0 align=center>
+<tr><td bgcolor=white>&nbsp;</td><td align=center colspan=3 bgcolor=white>второй множитель</td></tr>
+<tr><td align=center bgcolor=white>первый множитель</td><td align=center bgcolor=white>i</td><td align=center bgcolor=white>j</td><td align=center bgcolor=white>k</td></tr>
+<tr><td align=center bgcolor=white>i</td><td align=center bgcolor=white>-1</td><td align=center bgcolor=white>k</td><td align=center bgcolor=white>-j</td></tr>
+<tr><td align=center bgcolor=white>j</td><td align=center bgcolor=white>-k</td><td align=center bgcolor=white>-1</td><td align=center bgcolor=white>i</td></tr>
+<tr><td align=center bgcolor=white>k</td><td align=center bgcolor=white>j</td><td align=center bgcolor=white>-i</td><td align=center bgcolor=white>-1</td></tr>
+</table>
+
+</td></table>
+
+<p>Кроме того, из этих правил можно вывести правило для умножения кватернионов,
+заданных в форме [scalar,vector]:
+
+<p class=expression>q1 = [s1,v1],<br>
+q2 = [s2,v2],<br>
+q1*q2 = [s1*s2 - v1*v2, s1*v2 + s2*v1 + v1xv2].<br>
+
+<p>Здесь v1*v2 - скалярное произведение векторов v1, v2; v1xv2 - векторное, все
+остальные произведения обычные (либо число на число, либо число на вектор).
+
+<p>Нужны же кватернионы для представления и интерполяции поворотов. Поворот
+относительно оси (x,y,z) (иными словами, поворот вокруг вектора (x,y,z),
+проведенного из начала координат) на угол angle представляется кватернионом
+q, лежащим на единичной 4D-сфере (то есть, 4D-вектором длины 1):
+
+<p class=expression>s = cos(angle/2),<br>
+v = (x,y,z) * sin(angle/2) / |(x,y,z)|,<br>
+q = [s,v].<br>
+
+<p>Что интересно, в такой форме поворот, соответствующий комбинации поворотов
+q1 и q2, просто равен их произведению. В случае с 3D Studio это позволяет
+быстро и просто перевести сохраненные в CHUNK_TRACKROTATE относительные
+повороты в абсолютные: просто читаем эти самые повороты (а записаны они как
+раз в форме [angle,(x,y,z)], причем длина вектора (x,y,z) уже приведена к
+единичной), переводим их в кватернионную форму, получаем набор кватернионов
+q0, q1, ..., q(n-1), qn. Здесь q0 и так задает абсолютный поворот, а вот все
+остальные придется переводить (умножение здесь, конечно, кватернионное):
+
+<p class=expression>absolute_q0 = q0,<br>
+absolute_q1 = q1*absolute_q0,<br>
+absolute_q2 = q2*absolute_q1,<br>
+...<br>
+absolute_qn = qn*absolute_q(n-1).<br>
+
+<p>Получаем набор кватернионов, задающих абсолютные повороты, или абсолютную
+ориентацию объекта в какие-то моменты времени. Для того же, чтобы получить
+поворот-ориентацию в любой момент времени, придется как-то интерполировать
+повороты между этими заданными ключевыми значениями.
+
+<br>Все кватернионы, задающие повороты, должны лежать на единичной 4D-сфере,
+поэтому простейший метод (линейная интерполяция) несколько усложнится: мы
+вынуждены интерполировать не по прямой между двумя векторами, а по дуге на
+этой 4D-сфере, являющейся сечением сферы плоскостью, проходящей через центр
+сферы и наши два вектора, то есть две точки на сфере. Все это называется
+сферической линейной интерполяцией (spherical linear interpolation, если
+скоращенно, slerp) и определяется следующим образом:
+
+<p class=expression>slerp(q1,q2,t) = (q1*sin((1-t)*a) + q2*sin(t*a)) / sin(a),<br>
+
+<p>где t - локальное время (см.<a href="76.htm">п.7.6</a>), a - угол между векторами q1, q2;
+
+<p class=expression>0 <= t <= 1,<br>
+cos(a) = (q1,q2)/(|q1|*|q2|) = (q1,q2).<br>
+
+<p>То есть q1, q2 здесь уже рассматриваем как 4D-вектора. Приведенную формулу
+нетрудно вывести (для лучшего понимания): нам нужна такая точка q, которая
+лежит на единичной сфере, лежит в одной плоскости с q1 и q2 и центром (то
+есть нулем), причем угол между векторами q и q1 меняется линейно и, таким
+образом, равен t*a. Раз точка лежит в одной плоскости с 0, q1, q2, то
+вектор q равен линейной комбинации векторов q1, q2:
+
+<p class=expression>q = k1*q1 + k2*q2,<br>
+
+<p>где k1, k2 - какие-то (пока неизвестные) коэффициенты. q лежит на сфере,
+значит, длина q равна 1, отсюда имеем:
+
+<p class=expression>|q| = (q,q) = 1,<br>
+(k1*q1+k2*q2, k1*q1+k2*q2) = 1,<br>
+k1*k1*(q1,q1) + k2*k2*(q2,q2) + 2*k1*k2*(q1,q2) = 1,<br>
+k1*k1 + k2*k2 + 2*k1*k2*(q1,q2) = 1.<br>
+
+<p>Угол между q и q1 равен t*a, отсюда:
+
+<p class=expression>cos(q,q1) = cos(t*a),<br>
+(q,q1) = cos(t*a),<br>
+k1*(q1,q1) + k2*(q1,q2) = cos(t*a),<br>
+k1 + k2*(q1,q2) = cos(t*a).<br>
+
+<p>Получили систему уравнений для k1, k2:
+
+<p class=expression>k1 + k2*(q1,q2) = cos(t*a),<br>
+k1*k1 + k2*k2 + 2*k1*k2*(q1,q2) = 1,<br>
+
+<p>или
+
+<p class=expression>k1 + k2*cos(a) = cos(t*a),<br>
+k1*k1 + k2*k2 + 2*k1*k2*cos(a) = 1.<br>
+
+<p>Отсюда k1 = (cos(t*a) - k2*cos(a)), и получаем квадратное уравнение:
+
+<p class=expression>cos(t*a)^2 - 2*k2*cos(a)*cos(t*a) + k2^2*cos(a)^2 + k2^2 +<br>
+2*k2*cos(a)*cos(t*a) - 2*k2^2*cos(a)^2 = 1,<br>
+<br>
+cos(t*a)^2 + k2^2*(1 - cos(a)^2) = 1,<br>
+<br>
+k2^2 * sin(a)^2 = sin(t*a)^2,<br>
+<br>
+k2 = sin(t*a) / sin(a),<br>
+<br>
+k1 = cos(t*a) - sin(t*a)*cos(a) / sin(a) =<br>
+&nbsp;&nbsp; = (cos(t*a)*sin(a) - sin(t*a)*cos(a)) / sin(a) =<br>
+&nbsp;&nbsp; = sin(a - t*a) / sin(a) = sin((1 - t)*a) / sin(a).<br>
+
+<p>Если a - очень маленький угол, настолько, что могут возникнуть ошибки при
+делении на sin(a), можно использовать обычную линейную интерполяцию (так
+как при маленьких значениях a sin(a) ~= a, sin(t*a) ~= t*a, и так далее).
+
+<p>Итак, мы умеем задавать повороты кватернионами, мы умеем их интерполировать
+линейно по множеству их возможных значений, то есть, поверхности сферы. Но
+хочется ведь интерполировать сплайнами Кочанека-Бартельса (далее везде, где
+используется термин "сплайны", подразумеваются именно такие сплайны), так
+как ориентация объекта должна меняться плавно, а не рывками, и желательно
+по совршенно той же траектории, что и в 3D Studio. Причем строить сплайны
+надо на поверхности четырехмерной сферы, иначе результаты интерполяции не
+будут соответствовать поворотам; кватернион-поворот должен обязательно
+лежать на единичной 4D-сфере. Естественное, возникает вопрос - как все это
+сделать?
+
+<p>Оказывается, кубическую функцию, переписав ее в определенном виде, можно
+строить только с помощью линейной интерполяции - или, для нашего случая, с
+помощью сферической линейной интерполяции. А именно, переписываем эту самую
+произвольную кубическую функцию в виде
+
+<p class=expression>g(t) = v1*(1-t)^3 + c1*3*t*(1-t)^2 + c2*3*t^2*(1-t) + v2*t^3,
+
+<p>и считаем ее значение в произвольно взятой точке t, используя только
+линейную интерполяцию (linear interpolation, lerp): пусть
+
+<p class=expression>lerp(a, b, t) = a*(1-t) + b*t,
+
+<p>тогда g(t) можно посчитать вот так:
+
+<p class=expression>tmp1 = lerp(v1, c1, t),<br>
+tmp2 = lerp(c1, c2, t),<br>
+tmp3 = lerp(c2, v2, t),<br>
+tmp4 = lerp(tmp1, tmp2, t),<br>
+tmp5 = lerp(tmp2, tmp3, t),<br>
+g(t) = lerp(tmp4, tmp5, t).<br>
+
+<p>Нам же надо интерполяцию сплайнами по поверхности сферы, это можно получить,
+всего-навсего заменив в приведенных выше формулах линейную интерполяцию lerp
+на наш сферический вариант, slerp. Далее, сравнивая g(t) с полученной в
+<a href="76.htm">п.7.6.</a> интерполяционной функцией f(t) можно заметить, что, если
+
+<pre class=formula>
+p1 = v1              <=>   v1 = p1,
+r1 = (c1 - v1) * 3   <=>   c1 = (p1 + r1) / 3,
+r2 = (v2 - c2) * 3   <=>   c2 = (p2 - r2) / 3,
+p2 = v2              <=>   v2 = p2,
+</pre>
+
+<p>то g(t) совпадает с f(t). Длинный и нудный вывод для v1, v2, c1, c2 через
+функции lerp()/slerp() делать, пожалуй, смысле нет, так что ограничимся
+конечными результатами. А именно, для каждой точки-ключа cur имеем
+
+<p class=expression>g1 = slerp(cur, prev, -(1+bias)/3.0);<br>
+g2 = slerp(cur, next,  (1-bias)/3.0);<br>
+g3 = slerp(g1, g2, 0.5 + 0.5*continuity);<br>
+g4 = slerp(g1, g2, 0.5 - 0.5*continuity);<br>
+cur.ra = slerp(cur, g3,  (tension-1));<br>
+cur.rb = slerp(cur, g3, -(tension-1));<br>
+
+<p>Для начальной и конечной точки, соответственно, имеем следующее:
+
+<p class=expression>q0.rb = slerp(p0, p1, (1-tension)*(1+continuity*bias)/3.0);<br>
+qn.ra = slerp(pn, p(n-1), (1-tension)*(1-continuity*bias)/3.0);<br>
+
+<p>При интерполяции между какими-то точками a и b просто полагаем
+
+<p class=expression>v1 = a,<br>
+c1 = a.rb,<br>
+c2 = b.ra,<br>
+v2 = b,<br>
+
+<p>и считаем g(t) по приведенному выше алгоритму. Здесь мы до сих пор не учли
+параметры ease to и ease from, но это дело одной строки кода - посчитать на
+самом деле надо не g(t), а g(ease(t)). Впрочем, обычно ease(t) = t. Что это
+за функция ease(), откуда она берется, для чего нужна и как рассчитывается,
+написано в <a href="76.htm">п.7.6</a>.
+
+<p>Таким образом, получаем кватернион, соответствующий повороту, задающий
+ориентацию объекта. Осталось выяснить, как из этого кватерниона получить
+что-нибудь более привычное - скажем, матрицу поворота. С одной стороны,
+вспомнив, как делается перевод в кватернионную форму для поворота на угол
+angle относительно оси (x,y,z), можно написать, что
+
+<p class=expression>q = [s,v],<br>
+angle = 2 * arccos(angle),<br>
+(x,y,z) = v / sin(angle/2),<br>
+
+<p>и посчитать матрицу поворота на полученный угол относительно полученной оси.
+Но есть метод попроще, позволяющий получить матрицу непосредственно из
+кватерниона:
+
+<pre class=formula>
+q = [w,(x,y,z)],
+
+    [ 1-2*(y*y+z*z)   2*(x*y-w*z)     2*(x*z+w*y)   ]
+A = [ 2*(x*y+w*z)     1-2*(x*x-z*z)   2*(y*z-w*x)   ]
+    [ 2*(x*z-w*y)     2*(y*z+w*x)     1-2*(x*x-y*y) ].
+</pre>
+
+<p>Подведем итог. Для интерполяции ориентации объекта в какой-то момент времени
+с помощью кватернионов и сплайнов придется сделать почти то же самое, что и
+в случае "обычной" интерполяции чего-нибудь сплайнами (<a href="76.htm">п.7.6</a>). Различия же
+заключаются в следующем:
+
+<ul>
+<li><p>все повороты надо заранее перевести в кватернионную форму;
+<li><p>расчеты производных и интерполяция делаются по формулам, данным
+именно в этом пункте, а не по "обычным" для сплайнов;
+<li><p>из кватернионной формы результирующий поворот обычно надо перевести
+в привычную матричную.
+</ul>
+
+<p>Все остальное совпадает с планом действий при "обычной" сплайновой
+интерполяциии и изложено в пункте <a href="76.htm">7.6</a>.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="76.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="78.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

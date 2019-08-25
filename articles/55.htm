@@ -1,0 +1,207 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Освещение. Освещение по Фонгу.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b5.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+ОСВЕЩЕНИЕ<br>5.5. Освещение по Фонгу
+
+<!-- Article -->
+
+<p>Здесь принято делать, как минимум, такие предположения:
+
+<ul>
+<li>Ks = 0 (то есть грань не отражает свет, а только рассеивает)
+</ul>
+
+<p>Да-да, здесь нет никакой ошибки. Практически все обычно используемые (в demo
+по меньшей мере) методы т.н. "освещения по Фонгу" НЕ учитывают отраженной
+компоненты освещенности.
+
+<p>Здесь будет рассказано о самом, наверное, популярном методе освещения по
+Фонгу, который сводит освещение к текстурированию по определенной текстуре.
+
+<p>Этот метод базируется на таких добавочных предположениях:
+
+<ul>
+<li>L - константа (как бы точечный источник, удаленный бесконечно далеко)
+<li>длина единичной нормали к объекту при интерполяции между вершинами
+грани НЕ меняется
+</ul>
+
+<p>То есть, утверждается, что если в вершинах нормаль к объекту имеет длину 1,
+то при интерполяции этой нормали между вершинами по какой-то грани мы будем
+получать в каждой точке нормаль той же самой длины 1. На самом деле это вовсе
+даже не так, но для несильно разнящихся углов наклона нормалей приблизительно
+верно.
+
+<p>Так как Ks = 0, а длина N по предположению равна 1 на всей грани, имеем:
+
+<p class=expression>intensity = ambient + amp * (N * L).<br>
+
+<p>Рассмотрим упрощенный случай, когда вектор L = (0,0,1). Общий случай можно
+без особых вычислительных затрат привести к этому упрощенному, как - будет
+рассказано чуть позже. Так вот, в этом случае
+
+<p class=expression>intensity = ambient + amp * (N.x * L.x + N.y * L.y + N.z * L.z) =<br>
+= ambient + amp * (N.x * 0 + N.y * 0 + N.z * 1) =<br>
+= ambient + amp * N.z =<br>
+= ambient + amp * sqrt(1 - (N.x * N.x + N.y * N.y)).<br>
+
+<p>То есть интенсивность выражается через N.x, N.y, а эти величины меняются
+линейно. N.x и N.y у нас - числа с плавающей запятой от -1 до 1 (т.к. длина
+вектора равна 1), интерполировать их - занятие медленное, да корень считать
+раз в пиксел тоже не хочется. Поэтому вместо интерполяции N.x и N.y обычно
+интерполируют, например, 128*(N.x+1) и 128*(N.y+1), причем уже в целых
+числах. Тогда все возможные значения таким образом отмасштабировнных N.x,
+N.y - это 0, 1, ..., 255. Поэтому можно заранее посчитать табличку значений
+intensity для каждой пары отмасштабировнных N.x, N.y.
+
+<p>То есть, мы линейно интерполируем 128*(N.x+1) и 128*(N.y+1) (эти значения
+меняются тоже линейно, раз N.x, N.y меняются линейно) и по ним по таблице
+определяем интенсивность. Это и есть текстурирование, только в качестве
+текстуры используется таблица освещенности размером 256x256 (или любым
+другим), а в качестве координат текстуры u, v для каждой вершины берутся
+отмасшатбированные координаты нормали в этой вершине.
+
+<p>Таблица, согласно всего вышеупомянутого, считается так:
+
+<pre class=source>
+// ...
+for (i = 0; i < 256; i++) {
+  for (j = 0; j < 256; j++) {
+    r =
+      pow((i - 128) / 256.0, 2) +  // это N.x*N.x
+      pow((j - 128) / 256.0, 2);   // это N.y*N.y
+    // длина N меньше 1, поэтому r > 1 быть не может
+    if (r > 1) r = 1;
+    phongTable[i][j] = amp * sqrt(1 - r);
+  }
+}
+// ...
+</pre>
+
+<p>Правда, обычно используют другую - нелинейную - таблицу, видимо, хоть для
+какой-то компенсации всяких ошибок линеаризации... Результаты выглядят
+действительно получше. Считается она так:
+
+<pre class=source>
+// ...
+for (i = 0; i < 256; i++)
+  for (j = 0; j < 256; j++)
+    phongTable[i][j] =
+      amp * pow(sin(i * PI / 256) * sin(j * PI / 256), 4);
+// ...
+</pre>
+
+<p>Для полного комплекта осталось только привести кусочек кода по вычислению
+координат в этой таблице:
+
+<pre class=source>
+// ...
+len = N.x * N.x + N.y * N.y + N.z * N.z;
+N.x /= len; // на случай, если длина N не равна 1
+N.y /= len;
+N.z /= len;
+u = (1 + N.x) * 128; // собственно расчет координат
+v = (1 + N.y) * 128;
+// ...
+</pre>
+
+<p>Теперь вернемся к вопросу о том, как привести случай с произвольным вектором
+освещения к только что рассмотренному, где L = (0,0,1). Здесь все вроде бы
+просто. Просто применим к нормалям в вершинах любой поворот, совмещающий наш
+произвольный вектор света с вектором (0,0,1). Скалярное произведение при этом
+не изменяется, поэтому так делать можно. Ну, а после этого поворота уже имеем
+только что расписанный упрощенный случай.
+
+<p>Этот поворот нормалей в каждой вершине не требует практически никаких затрат
+по следующей причине. Поворот сам по себе, конечно, достаточно медленная
+процедура и процессорное время отъедает. Но при движении и вращении камеры
+и объекта мы все равно должны будем соответственно поворачивать нормали. Так
+вот, эти два поворота можно совместить в один. Если использовать матрицы,
+все это делается совсем просто - достаточно перемножить (в нужном порядке!)
+матрицу собственного поворота объекта, матрицу перехода от произвольной
+камеры к нашей "стандартной" камере и матрицу перехода от произвольного
+вектора света к "стандартному" вектору света (0,0,1). Т.е. добавится расчет
+этой матрицы перехода и одно матричное умножение на объект, а это уже мелочь.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="54.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="56.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

@@ -1,0 +1,207 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Разное. Обратная трассировка лучей.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b7.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+РАЗНОЕ<br>7.8. Обратная трассировка лучей
+
+<!-- Article -->
+
+<p>Обратная трассировка лучей (она же рэйкастинг, raycasting) - простой, хотя
+и довольно медленный, метод получения высокореалистичных изображений. Этот
+метод часто путают с прямой трассировкой лучей (рэйтрэйсинг, raytracing),
+которая, на самом деле, практически никогда и никем не используется из-за
+своей редкостной неэффективности. Впрочем, эти два термина уже практически
+и не различают.
+
+<p>Итак, идея обратной трассировки лучей. Для определения цвета пиксела экрана
+через него из камеры проводится луч, ищется его ближайшее пересечение со
+сценой и определяется освещенность точки пересечения. Эта освещенность
+складывается из отраженной и преломленной энергий, непосредственно
+полученных от источников света, а также отраженной и преломленной энергий,
+идущих от других объектов сцены. После определения освещенности этой точки
+учитывается ослабление света при прохождении через прозрачный материал и
+в результате получается цвет точки экрана.
+
+<p>Для определения освещенности, привносимой непосредственным освещением, из
+точки пересечения выпускаются лучи ко всем источникам света и определяется
+вклад всех источников, которые не заслонены другими объектами сцены. Для
+определения отраженной и преломленной освещенности из точки выпускаются
+отраженный и преломленный лучи и определяется привносимая ими освещенность.
+
+<p>Непосредственное освещение от источника света считаем, например, по уравнению
+Фонга (см. <a href="51.htm">п.5.1</a>). На самом деле, компоненты diffuse и specular в этом
+уравнении для большей реалистичности с точки зрения физики надо разделить
+на квадрат расстояния до источника света, но обычно этим пренебрегают.
+
+<p>Ослабление света в прозрачной среде учитывается делением на коэффициент
+
+<p class=expression>k = exp(beta * l),<br>
+
+<p>где
+
+<p><table width=480 cellspacing=0 cellpadding=0 border=0 align=center>
+<tr><td><p class=expression>k</td><td>коэффициент ослабления</td></tr>
+<tr><td><p class=expression>beta</td><td>коэффициент прозрачности среды</td></tr>
+<tr><td><p class=expression>l</td><td>длина пути внутри среды</td></tr>
+</table>
+
+<p>Наконец, преломляется луч света по следующему закону:
+
+<p class=expression>sin(b) = n1 * sin(a) / n2,<br>
+
+<p>где
+
+<p><table width=480 cellspacing=0 cellpadding=0 border=0 align=center>
+<tr><td><p class=expression>a</td><td>угол между падающим лучом L и нормалью N</td></tr>
+<tr><td><p class=expression>b</td><td>угол между преломленным лучом L' и нормалью N</td></tr>
+<tr><td><p class=expression>n1</td><td>коэффициент преломления среды, в которой проходит луч L</td></tr>
+<tr><td><p class=expression>n2</td><td>коэффициент преломления среды, в которой проходит луч L'</td></tr>
+</table>
+
+<p>Вот иллюстрация.
+
+<p><center><img src="illu/illu78a.gif" width=180 height=180 alt="рисунок (illu/illu78a.gif)"></center>
+
+<p>Для воздуха считают beta = 0, n = 1; для всех остальных сред обычно beta > 0,
+n > 1. Надо отметить, что все эти коэффициенты (отражения, преломления,
+прозрачности) различны для каждой из трех цветовых компонент R, G, B. Еще
+надо отметить, что обычно объекты непрозрачны и поэтому преломлением
+пренебрегают.
+
+<p>Алгоритм работы функции трассировки луча с началом o = (ox,oy,oz) и
+направлением d = (dx,dy,dz), возвращающей, кстати, освещенность по всем трем
+цветовым компонентам, будет, таким образом, выглядеть примерно так:
+
+<ul>
+<li><p>
+ищем ближайшее пересечение луча со сценой (определяем точку p, где
+произошло пересечение, выясняем, с каким конкретно объектом оно
+произошло)
+<ul>
+<li><p>если не нашли, возвращаем 0
+<li><p>если пересечение есть, текущую освещенность полагаем равной
+фоновой освещенности (ambient)
+</ul>
+
+<li><p>определяем вектор n, нормаль к объекту в точке пересечения
+
+<li><p>для кажого (точечного) источника света
+<ul>
+<li><p>считаем вектор l, соединяющий источник и точку p (начало в p)
+<li><p>ищем пересечение луча с началом в точке p и направлением d со сценой
+<ul><li><p>если нашли, прекращаем обработку этого источника, так как его не видно</ul>
+<li><p>считаем симметричный l относительно n вектор r
+<li><p>считаем по уравнению Фонга (оно использует n, l, r, d) освещенность
+в точке за счет этого источника света, добавляем ее к текущей
+</ul>
+
+<li><p>считаем симметричный d относительно n вектор refl, то есть отраженный
+вектор
+
+<li><p>трассируем отраженный луч (с началом p и направлением refl), добавляем
+полученную освещенность к текущей
+
+<li><p>считаем направление преломленного луча (вектор refr) по d, n и
+коэффициентам преломления
+
+<li><p>трассируем преломленный луч (с началом p и направлением refr), добавляем
+полученную освещенность к текущей
+
+<li><p>покомпонентно умножаем текущую освещенность на цвет объекта
+
+<li><p>если для материала, заполняющего пройденную лучом от o до p трассу
+beta&nbsp;!=&nbsp;0, умножаем текущую освещенность на коэффициент ослабления
+
+<li><p>возвращаем текущую освещенность
+</ul>
+
+<p>При стандартной камере, которая находится в (0,0,-dist), и ориентирована так,
+что пикселу экрана (sx,sy) соотвествует 3D-точка (sx-xSize/2, ySize/2-sy, 0),
+для получения цвета пиксела (sx,sy), очевидно, достаточно оттрассировать луч,
+положив при этом
+
+<p class=expression>ox = oy = dz = 0,<br>
+oz = -dist,<br>
+dx = sx - xSize / 2,<br>
+dy = ySize / 2 - sy.<br>
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="77.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

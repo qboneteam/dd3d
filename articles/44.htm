@@ -1,0 +1,204 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Текстурирование. Параболическое.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b4.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+ТЕКСТУРИРОВАНИЕ<br>4.4. Параболическое
+
+<!-- Article -->
+
+<p>Этот метод основан на приближении u, v квадратичными функциями - параболами,
+то есть. Для каждой строки строится приближающие u, v квадратичные функции,
+дальше с их помощью они интерполируются по строке. Для этого нам понадобятся
+точные значения u, v в трех точках - начале, середине и конце строки. Их
+считаем точно так же, как в 4.3.
+
+<p>Итак, пусть у нас есть точные значения u в начале, середине и конце строки,
+то есть на расстоянии 0, length/2 и length пикселов от начала этой строки,
+обозначим их как ua, ub, и uc соответственно. Мы пытаемся приблизить u
+квадратичной функцией, то есть полагаем, что
+
+<p class=expression>u = A*x*x + B*x + C,<br>
+
+<p>где x - расстояние от текущей точки до начала строки. Тогда, подставив в
+формулу ua, ub, uc и соответствующие им x, получаем:
+
+<p class=expression>ua = C,<br>
+ub = A*(length*length)/4 + B*length/2 + C,<br>
+uc = A*(length*length)   + B*length   + C.<br>
+
+<p>Т.о. C = ua, а для A и B имеем систему уравнений:
+
+<p class=expression>A*(length*length)/4 + B*length/2 = ub - ua,<br>
+A*(length*length)   + B*length   = uc - ua.<br>
+
+<p>Умножим первое уравнение на четыре, вычтем из него второе:
+
+<p class=expression>4*A*(length*length)/4 + 4*B*length/2 -
+A*(length*length    -   B*length =<br> 4*(ub - ua) - (uc - ua),<br><br>
+B*length = 4*(ub - ua) - (uc - ua),<br>
+B = (4*(ub - ua) - (uc - ua)) / length.<br>
+
+<p>Умножим первое уравнение на два, вычтем его из второго:
+
+<p class=expression>A*(length*length)   +   B*length -
+2*A*(length*length)/4 - 2*B*length/2 =<br> (uc - ua) - 2*(ub - ua),<br><br>
+A*(length*length)/2 = (uc - ua) - 2*(ub - ua),<br>
+A = (2*(uc - ua) - 4*(ub - ua)) / (length*length).<br>
+
+<p>Получили формулы для A, B, C. Найдем теперь du и ddu. Для текущей точки x
+имеем:
+
+<p class=expression>du(x) = u(x+1) - u(x),<br>
+du = (A*(x+1)*(x+1)+B*(x+1)+C) - (A*x*x+B*x+C) = A*(2*x+1) + B,<br>
+<br>
+ddu(x) = du(x+1) - du(x),<br>
+ddu = (A*(2*(x+1)+1)+B) - (A*(2*x+1)+B) = 2*A.<br>
+
+<p>Т.о., начальные значения u, du, ddu будут равны
+
+<p class=expression>u   = C,<br>
+du  = A + B,<br>
+ddu = 2*A.<br>
+
+<p>А по известным начальным значениям u, du, ddu последовательно вычисляем
+значения u в любой точке:
+
+<p class=expression>u(0), du(0), ddu - известны<br>
+u(1) = u(0) + du(0), du(1) = du(0) + ddu<br>
+u(2) = u(1) + du(1), du(2) = du(1) + ddu<br>
+u(3) = u(2) + du(2), du(3) = du(2) + ddu<br>
+...<br>
+
+<p>Для v все делается полностью аналогично.
+
+<p>Таким образом, рисование строки будет выглядеть примерно так:
+
+<pre class=source>
+// ...
+
+// считаем u, v для начала, середины и конца строки
+ua = uz_start / z1_start;
+va = vz_start / z1_start;
+ub = (uz_start + uz_end) / (z1_start + z1_end);
+vb = (vz_start + vz_end) / (z1_start + z1_end);
+uc = uz_end / z1_end;
+vc = vz_end / z1_end;
+
+// считаем начальное du и ddu
+pa = 2 * ((uc - ua) - 2 * (ub - ua)) / (length * length);
+pb = (4 * (ub - ua) - (uc - ua)) / length;
+pc = ua;
+u   = pc;
+du  = pa + pb;
+ddu = 2 * pa;
+
+// считаем начальное dv и ddv
+pa = 2 * ((vc - va) - 2 * (vb - va)) / (length * length);
+pb = (4 * (vb - va) - (vc - va)) / length;
+pc = v_a;
+v   = pc;
+dv  = pa + pb;
+ddv = 2 * pa;
+
+// рисуем кусок
+while (length--) {
+  putpixel(current_sx, current_sy, texture[v][u]);
+  u += du;
+  v += dv;
+  du += ddu;
+  dv += ddv;
+}
+// ...
+</pre>
+
+<p>По сравнению с перспективно-корректным текстурированием имеем более медленный
+внутренний цикл, но меньшее для длинных строк количество делений. Расчет ua,
+va и иже с ними можно сделать с помощью трех делений, деления на length и
+(length*length) можно заменить умножениями на 1/length и 1/(length*length),
+беря эти значения из заранее посчитанной таблички. Т.о., на строку приходится
+три деления независимо от ее длины. Качество более-менее приемлемое; а для
+коротких строк можно использовать обычную линейную интерполяцию, точно так же,
+как и в случае с перспективно-корректным текстурированием. Получаем вполне
+конкурентоспособный метод текстурирования.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="43.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="45.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

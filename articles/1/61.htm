@@ -1,0 +1,384 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Оптимизация. Приемы оптимизации для процессоров Intel Pentium.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td>
+
+<p class=title>
+<img src="../img/b6.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+ОПТИМИЗАЦИЯ<br>6.1. Приемы оптимизации для процессоров Intel Pentium
+<div align=justify>
+
+<!-- Article -->
+
+<p>Все, что здесь написано, является выборкой наиболее важных на мой взгляд
+фактов из документации от Agner Fog. Если вы серьезно интересуетесь
+оптимизацией для Intel Pentium (plain, MMX, PPro, P2), найдите и прочтите
+эту документацию (я нашел на <a href="http://www.agner.org/assem">http://www.agner.org/assem</a>, относительно
+старая версия есть на <a href="ftp://ftp.cdrom.com/pub/sac/text/pentopt.zip">ftp://ftp.cdrom.com/pub/sac/text/pentopt.zip</a>).
+
+<div align=left>
+<a name="611"></a>
+<p class=title><img src="../img/b6.gif" width=70 height=70 align=left hspace=0 alt=""><img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">6.1.1. Спаривание целочисленных команд
+<div align=justify>
+
+<p>По-моему, основной прием ускорения. Дело в том, что у процессоров Pentium
+есть два конвейера обработки команд, U-pipe и V-pipe. В результате некоторые
+пары команд могут исполняться одновременно, а это практически удваивает
+скорость.
+
+<p>Эти команды могут быть исполнены и в U-pipe, и в V-pipe, и при этом могут
+быть спарены (с какой-либо другой командой):
+
+<p class=expression>mov reg/mem,reg/mem/imm<br>
+push reg/imm<br>
+pop reg<br>
+lea, nop, inc, dec, add, sub, cmp, and, or, xor<br>
+некоторые формы test<br>
+
+<p>Эти команды могут быть исполнены только в U-pipe, но при этом все-таки могут
+быть спарены:
+
+<p class=expression>adc, sbb<br>
+shr, sar, shl, sal на заданное число<br>
+ror, rol, rcr, rcl на единичку<br>
+
+<p>Эти команды могут быть исполнены в любом конвейере, но могут быть спарены
+только в V-pipe:
+
+<p class=expression>near call (близкий вызов)<br>
+short/near jump (короткий/близкий переход)<br>
+short/near conditional jump (короткий/близкий переход по условию)<br>
+
+<p>Все остальные целочисленные команды могут быть исполнены только в U-pipe
+и не могут быть спарены вообще.
+
+<p>Две последовательно идущих команды будут спарены в случае выполнения всех
+нижеследующих условий. Если хотя бы одно из условий не выполняется, то
+исполняется только первая команда, вторая (и, возможно, следующая за ней)
+команда будет исполнена лишь в следующем такте. Вот условия спаривания:
+
+<ol>
+<li>Первая команда может быть исполнена и спарена в U-pipe, вторая,
+соответственно, в V-pipe.<br><br>
+
+<li>Если первая команда записывает что-то в регистр, то вторая команда не
+может производить чтение/запись из регистра. Причем, в этом условии
+части регистров считаются за весь регистр (то есть, запись в al/ah
+расценивается как запись в eax, а запись в cf - как запись в flags).
+
+Пример:
+
+<pre class=source>
+mov eax,1234h / mov ebx,eax   - НЕ будут спарены
+mov eax,1234h / mov ebx,1234h - будут спарены
+inc eax       / mov ecx,eax   - НЕ будут спарены
+mov ecx,eax   / inc ecx       - будут спарены
+mov al,bl     / mov ah,0      - НЕ будут спарены
+</pre>
+
+<li>Две команды, записывающие что-то в регистр флагов, могут быть
+спарены, несмотря на условие 2:
+
+<pre class=source>shr ebx,4 / inc ebx - спарится</pre>
+
+<li>Команда, записывающая что-то в регистр флагов, может быть спарена
+с условным переходом, несмотря на условие 2:
+
+<pre class=source>cmp eax,2 / ja @@label_bigger - спарится</pre>
+
+<li>Следующие пары команд могут спариться несмотря на то, что обе команды
+изменяют esp:
+
+<pre class=source>push + push, push + call, pop + pop</pre>
+
+<li>Существуют ограничения на исполнение команд с префиксом. Префиксы
+возникают в таких случаях:
+
+<ul>
+<li>команда, адресующаяся не к сегменту по умолчанию, имеет префикс
+сегмента (примеры: mov eax,es:[ebx]; mov eax,ds:[ebp])
+
+<li>команда, работающая с 16-битными операндами в 32-битном режиме
+или с 32-битными операндами в 16-битном режиме, имеет префикс
+разрядности операнда (примеры: mov ax,1234 в защищенном режиме;
+mov ax,word ptr [variable] в защищенном режиме; xor eax,eax в
+реальном режиме)
+
+<li>команды, использующая 32-битную адресацию в 16-битном режиме,
+имеет префикс разрядности адреса (пример: mov ax,[ebx] в реальном
+режиме)
+
+<li>rep, lock - префиксы (пример: rep stosd)
+
+<li>многие команды, которых не было на 8086, имеют двухбайтовый код
+команды, где первый байт равен 0Fh. На процессоре Pentium без MMX
+этот байт считается префиксом. Наиболее часто встречающиеся команды
+с префиксом 0Fh: movzx, movsx, push/pop fs/gs, lfs/lgs/lss, setXX,
+bt/btc/btr/bts/bsf/bsr/shld/shrd, imul с двумя операндами и без
+операнда-числа (immediate).
+</ul>
+
+<br>На процессоре Pentium без MMX команда с префиксом может исполняться
+только в U-pipe, исключение - близкие переходы по условию (conditional
+near jumps). На процессоре Pentium с MMX команды с префиксами 0Fh и
+размера операнда или адреса может исполняться в любом конвейере; но
+команды с префиксами сегмента, rep или lock (повторения или блокировки
+шины) могут исполняться только в U-pipe.<br><br>
+
+<li>Команда, в которой одновременно участвует смещение (displacement) и
+заданное число (immediate) не может быть спарена на процессоре Pentium
+без MMX и может быть выполнена и спарена только в U-pipe на процессоре
+Pentium с MMX. Вот примеры:
+
+<pre class=source>
+mov  byte ptr ds:[1000],0   ; НЕ спаривается ни с чем
+mov  byte ptr [ebx+8],1     ; НЕ спаривается ни с чем
+mov  byte ptr [ebx],1       ; спаривается в U-pipe
+mov  byte ptr [ebx+8],al    ; спаривается в U-pipe
+</pre>
+
+</ol>
+
+<p>Спаривающаяся команда, которая читает из памяти, считает и записывает
+результат в регистр или в регистр флагов занимает 2 такта. Спаривающаяся
+команда, которая читает из памяти, считает и записывает результат обратно
+в память занимает 3 такта. Примеры таких команд:
+
+<pre class=source>
+add eax,[ebx] ; 2 такта
+add [ebx],eax ; 3 такта
+</pre>
+
+<p>Существует также так называемое неполное спаривание (imperfect pairing),
+когда обе команды выполняются в разных конвейерах, но НЕ одновременно
+(возможно, частично перекрываясь по времени исполнения), а следующие за
+ними команды не могут начать исполнение, пока обе команды не закончатся.
+Такое случается в следующих случаях:
+
+<ol>
+<li>Вторая команда вызывает AGI (address generation interlock,
+блокировка генерирования адреса). Это происходит, если адрес,
+используемый во второй команде зависит от регистров, измененных
+в первой команде. Примеры:
+
+<pre class=source>
+add ebx,4 / mov eax,[ebx]       ; AGI
+mov eax,[ebx+4] / add ebx,4     ; нормально спаривается
+add esp,4 / pop esi             ; AGI (pop использует esp)
+inc esi / lea eax,[ebx+4*esi]   ; AGI
+</pre>
+
+<li>Две команды одновременно обращаются к одному и тому же двойному
+слову памяти. Примеры (подразумевается, что esi делится на 4):
+
+<pre class=source>
+mov al,[esi] / mov bl,[esi+1]    ; неполное спаривание
+mov al,[esi+3] / mov bl,[esi+4]  ; нормальное спариваение
+</pre>
+
+<li>Две команды одновременно обращаются к адресам, в которых одинковы
+биты 2-4 (это вызывает конфликт кэш-банков). Для dword-адресов это
+значит, что разница между двумя адресами делится на 32. Пример:
+
+<pre class=source>
+mov eax,[esi] / mov ebx,[esi+32000] ; неполное спаривание
+mov eax,[esi] / mov ebx,[esi+32004] ; нормальное спаривание
+</pre>
+
+<li>Первая команда производит чтение, подсчет и запись одновременно;
+вторая - чтение и изменение; в этом случае число тактов, требующееся
+для выполнения пары команд, можно рассчитать по следующей таблице:
+
+<p>
+
+<table cellpadding=0 cellspacing=0 border=0 align=center><td bgcolor=#5E5EA5>
+
+<table cellspacing=1 cellpadding=4 border=0 align=center>
+<tr><td bgcolor=white>&nbsp;</td><td colspan=3 align=center bgcolor=white>первая команда</td></tr>
+
+<tr>
+<td align=center bgcolor=white>вторая команда</td>
+<td align=center bgcolor=white>mov или<br>регистровая</td>
+<td align=center bgcolor=white>чтение/<br>подсчет</td>
+<td align=center bgcolor=white>чтение/подсчет/<br>запись</td>
+</tr>
+     
+<tr><td bgcolor=white>mov или регистровая</td><td align=center bgcolor=white>1</td><td align=center bgcolor=white>2</td><td align=center bgcolor=white>3</td></tr>
+<tr><td bgcolor=white>чтение/подсчет</td><td align=center bgcolor=white>2</td><td align=center bgcolor=white>2</td><td align=center bgcolor=white>4</td></tr>
+<tr><td bgcolor=white>чтение/подсчет/запись</td><td align=center bgcolor=white>3</td><td align=center bgcolor=white>3</td><td align=center bgcolor=white>5</td></tr>
+</table>
+
+</td></table>
+
+<p>Примеры:
+
+<pre class=source>
+add [mem1],eax / add ebx,[mem2]   ; 4 такта
+add ebx,[mem2] / add [mem1],eax   ; 3 такта
+add [mem1],eax / add [mem2],ebx   ; 5 тактов
+add [mem1],eax / sub ebx,ecx      ; 3 такта
+</pre>
+</ol>
+
+<div align=left>
+<a name="612"></a>
+<p class=title><img src="../img/b6.gif" width=70 height=70 align=left hspace=0 alt=""><img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">6.1.2. Кэш-память
+<div align=justify>
+
+<p>У процессора Pentium непосредственно на кристалле есть 8k кэш-памяти (это
+т.н. кэш-память первого уровня, L1 cache) для кода и 8k - для данных. Данные
+из L1 cache считываются/записываются за один такт; кэш-промах же может
+стоить довольно много тактов. Таким образом, для наиболее эффективного
+использования кэша необходимо знать, как он работает.
+
+<p>Итак, L1 cache состоит из 256 кэш-линий (cachelines), по 32 байта в каждой.
+При чтении данных, которых нет в кэше, процессор считывает из памяти целую
+кэш-линию. Кэш-линии всегда выравнены на физический адрес, делящийся на 32;
+так что если прочитать байт по адресу, делящемуся на 32, то можно читать и
+писать в следующий за ним 31 байт без всяких задержек. Свои данные имеет
+смысл располагать с учетом этого факта - например, выравнивать массивы из
+структур длиной 32 байта на 32; перед записью в видеопамять читать оттуда
+один байт (один раз на 32 записываемых байта); используемые вместе данные
+располагать вместе; и так далее.
+
+<p>Но кэш-линия не может быть связана с любым физическим адресом. У каждой
+кэш-линии есть некое 7-битное "заданное значение" (set-value), которое
+должно совпадать с битами адреса 5-11. Для каждого из 128 возможных значений
+set-value есть две кэш-линии. Отсюда следует то, что в кэше не может
+одновременно содержаться более двух блоков данных с одинаковыми битами
+адреса 5-11. Чем это чревато, покажем на примере.
+
+<pre class=source>
+    ; пусть в esi - адрес, делящийся на 32
+loop_label:
+    mov eax,[esi]
+    mov ebx,[esi+13*4096+4]
+    mov ecx,[esi+20*4096+28]
+    dec edx
+    jnz loop_label
+</pre>
+
+<p>У используемых трех адресов будет одинаковое значение в битах 5-11. Поэтому
+к моменту самого первого чтения в ecx в кэше точно не окажется свободной
+кэш-линии, процессор выберет для нее наименее использованную (least recently
+used) линию, ту самую, которая была использована при чтении eax. При
+чтении ebx, соответственно, будет заново перекрыта линия, использованная
+при чтении ecx... В результате цикл будет состоять из сплошных кэш-промахов
+и съест порядка 60 тактов. Если же поменять 28 на 32, изменив, таким образом,
+на единичку биты 5-11 для адреса [esi+20*4096+28], то для чтения в eax и ebx
+будут как раз использованы две имеющихся линии, для чтения в ecx - третья,
+не совпадающая ни с одной из этих двух. В результате - скорость порядка
+трех тактов на один проход и ускорение примерно в 20 (!!!) раз.
+
+<p>Еще одна интересная вещь, которую стоит учесть - Pentium НЕ загружает
+кэш-линию при промахе записи; только при промахе чтения. При промахе записи
+данные пойдут в L2 cache или память (в зависимости от настроек L2 cache).
+А это довольно медленно. Поэтому, если мы последовательно пишем в один и
+тот же 32-байтовый блок, но не читаем оттуда, то имеет смысл сначала сделать
+холостое чтение из этого блока, чтобы загрузить его в L1 cache; тогда все
+последовательные операции записи будут есть только по одному такту.
+
+<div align=left>
+<a name="613"></a>
+<p class=title><img src="../img/b6.gif" width=70 height=70 align=left hspace=0 alt=""><img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">6.1.3. Разные трюки
+<div align=justify>
+
+<p>Трюков есть много, перечислим здесь только наиболее часто используемые:
+
+<ul>
+<li><p>работа с fixed point вместо floating point иногда (если код не
+слишком сильно насыщен математикой) быстрее; практически всегда
+быстрее для клонов;
+
+<li><p>все данные желательно выравнивать по адресам, кратным размеру данных
+(то есть, переменные-байты можно не выравнивать, слова - выравнивать
+на 2, двойные слова - на 4); обращение к невыравненной переменной
+влечет за собой задержку минимум на три такта;
+
+<li><p>деление на заранее известное число можно заменить умножением на
+обратное ему число;
+
+<li><p>деление на степень двойки для целых чисел заменяется на сдвиг влево;
+деление чисел с плавающей точкой (fdiv) на Intel Pentium (на клонах,
+к несчастью, это не так) может исполняться параллельно с целочисленными
+командами.
+</ul>
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="56.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="62.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

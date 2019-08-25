@@ -1,0 +1,243 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Основы 3D графики. Работа с произвольной камерой.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b2.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+ОСНОВЫ 3D ГРАФИКИ<br>2.5. Работа с произвольной камерой
+
+<!-- Article -->
+
+<p>Рассмотрим любую камеру как точку - центр проецирования и экран - плоский
+прямоугольник в 3D пространстве, на плоскость которого идет проецирование.
+Наша стандартная камера, например, задается точкой (0,0,-dist) и экраном с
+вершинами (-xSize/2,ySize/2), ..., (xSize/2,-ySize/2). Можно задать эту
+систему тремя векторами, задающими с точки зрения камеры направления вперед,
+вправо и вверх; вектор "вперед" соединяет центр проецирования и центр экрана,
+вектор "вправо" соединяет центр экрана и правую его границу, вектор "вверх",
+соответственно, центр экрана и верхнюю его границу. Обозначим эти вектора
+как p, q и r соответственно, а центр проецирования за s. Вот пример для
+стандартной камеры.
+
+<p><center><img src="illu/illu25a.gif" width=180 height=180 alt="рисунок (illu/illu25a.gif)"></center>
+
+<p>Здесь (для стандартной камеры; обозначим ее вектора как Sp, Sq, Sr, Ss)
+
+<p class=expression>Sp = p = (0,0,dist)<br>
+Sq = q = (xSize/2,0,0)<br>
+Sr = r = (0,ySize/2,0)<br>
+Ss = s = (0,0,-dist)<br>
+
+<p>Любые три взаимно перпендикулярных вектора и точка - центр координат задают в
+3D пространстве систему координат. Так что объект мы можем рассматривать в
+системе обычных координат (x,y,z), в системе координат стандартной камеры
+(Sp,Sq,Sr) или в системе (p,q,r), соответствующей какой-то произвольной
+камере. В любом случае, если (a,b,c) - координаты точки в системе координат
+камеры (точнее, в системе координат с центром в точке s и базисом (p,q,r)),
+то координаты проекции точки на экране равны
+
+<p class=expression>screenX = xSize/2 + xSize/2 * a/c<br>
+screenY = ySize/2 - ySize/2 * b/c<br>
+
+<p>В случае стандартной камеры переход от обычной системы координат к системе
+координат камеры очевиден:
+
+<p class=expression>a = x / (xSize/2)<br>
+b = y / (ySize/2)<br>
+c = (z + dist) / dist<br>
+
+<p>Подставив это в формулы для screenX, screenY, получим как раз те самые формулы
+для проекции на стандартную камеру.
+
+<p>Поскольку со стандартной камерой нам достаточно удобно и понятно работать,
+для произвольной камеры мы должны сделаеть такое преобразование пространства,
+что как бы совместит произвольную камеру и стандартную камеру. То есть, такое
+преобразование, что вектора p, q, r перейдут в Sp, Sq, Sr, а точка s в точку
+Ss.
+
+<p>Посчитаем матрицу для *обратного* преобразования; оно должно переводить Sp,
+Sq, Sr, Ss в p, q, r, s. Преобразование, переводящее Ss в s (и наоборот) - это
+обычный паралелльный перенос; остается написать преобразование перевода Sp,
+Sq, Sr в p, q, r. Пусть у нас есть координаты p, q, r в системе координат
+(x,y,z):
+
+<p class=expression>p = (px,py,pz)<br>
+q = (qx,qy,qz)<br>
+r = (rx,ry,rz)<br>
+
+<p>Для Sp, Sq, Sr координаты (в этой же системе) известны и равны следующему:
+
+<p class=expression>Sp = (0,0,dist)<br>
+Sq = (xSize/2,0,0)<br>
+Sr = (0,ySize/2,0)<br>
+
+<p>Пусть T - искомая матрица перевода,
+
+<pre class=formula>
+    [ a b c ]
+T = [ d e f ], a..i - какие-то неизвестные.
+    [ g h i ]
+</pre>
+
+<p>Поскольку T переводит Sp, Sq, Sr в p, q, r; то есть
+
+<p class=expression>p = T*Sp<br>
+q = T*Sq<br>
+r = T*Sr<br>
+
+<p>то, подставляя, например, p и Sp, получаем:
+
+<pre class=formula>
+[ px ]   [ a b c ] [ 0    ]    [ c*dist ]
+[ py ] = [ d e f ] [ 0    ] =  [ f*dist ], откуда
+[ pz ]   [ g h i ] [ dist ]    [ i*dist ]
+</pre>
+
+<p class=expression>c = px/dist,<br>
+f = py/dist,<br>
+i = pz/dist.<br>
+
+<p>Аналогично находим все остальные элементы матрицы T:
+
+<pre class=formula>
+    [ qx*2/xSize  rx*2/ySize  px/dist ]
+T = [ qy*2/xSize  ry*2/ySize  py/dist ]
+    [ qz*2/xSize  rz*2/ySize  pz/dist ]
+</pre>
+
+<p>Но нас интересует обратное к этому преобразование. Оно задается обратной
+матрицей к T, то есть такой матрицей T1, что
+
+<pre class=formla>
+                  [ 1 0 0 ]
+T * T1 = T1 * T = [ 0 1 0 ]
+                  [ 0 0 1 ]
+</pre>
+
+<p>Обратная матрица, вообще говоря, существует далеко не всегда, да и вычисление
+ее в общем случае - достаточно неприятная задача. Однако в данном случае из-за
+специального вида матрицы T (конкретнее, из-за того, что T - ортогональная
+матрица) она не только всегда существует, но и считается очень просто:
+
+<pre class=formula>
+    [ qx*2/xSize  rx*2/ySize  px/dist ]   [ qx1 rx1 px1 ]
+T = [ qy*2/xSize  ry*2/ySize  py/dist ] = [ qy1 ry1 py1 ]
+    [ qz*2/xSize  rz*2/ySize  pz/dist ]   [ qz1 rz1 pz1 ]
+
+     [ qx1/lq  qy1/lq  qz1/lq ]
+T1 = [ rx1/lr  ry1/lr  rz1/lr ]
+     [ px1/lp  py1/lp  pz1/lp ]
+</pre>
+
+<p>где
+
+<p class=expression>lp = px1*px1 + py1*py1 + pz1*pz1<br>
+lq = qx1*qx1 + qy1*qy1 + qz1*qz1<br>
+lr = rx1*rx1 + ry1*ry1 + rz1*rz1<br>
+
+<p>Сделав сначала параллельный перенос, совмещающий s и Ss, а потом полученное
+преобразование, как раз и получим преобразование, переводящее произвольную
+камеру в стандартную.
+
+<p>Теперь надо выяснить, как, собственно посчитать координаты p, q, r через
+имеющиеся у нас характеристики: положение, направление, угол зрения и угол
+поворота. 3D Studio (и мы вслед за ней) рассчитывает эти вектора по такому
+алгоритму:
+
+<p class=expression>1. Считаем p = target - location<br>
+2. Если p.x == 0 и p.z == 0, то q = (0, 0, 1); иначе q = (p.z, 0, -p.x)<br>
+3. Считаем r = crossProduct(p, q) - векторное произведение p на q<br>
+4. Считаем lp = length(p) - длина p<br>
+5. Приводим r и q к длине 2*lp*tan(FOV/2)<br>
+
+<p>Здесь мы не учитываем поворот камеры вокруг своей оси, его удобнее сделать
+после перехода к стандартной камере - в этом случае получаем обычный поворот
+относительно оси z на угол roll.
+
+<p>Таким образом, окончательная матрица перевода должна представлять собой
+произведение матрицы параллельного переноса, матрицы T1 и матрицы поворота
+вокруг оси z на угол roll:
+
+<p class=expression>FinalCameraMatrix = RollMatrix * T1 * MoveMatrix
+
+<p>Расчет матриц RollMatrix и MoveMatrix очевиден.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="24.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="31.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

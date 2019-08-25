@@ -1,0 +1,150 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Разное. Субпиксельная точность.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b7.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+РАЗНОЕ<br>7.1. Субпиксельная точность
+
+<!-- Article -->
+
+<p>Субпиксельная точность означает следующее: только те пикселы, центры которых
+лежат внутри данного многоугольника, должны быть нарисованы. На самом деле,
+в этом определении можно использовать любую (зафиксированную) точку внутри
+пиксела, единственным последствием этого будет сдвиг всего экрана меньше, чем
+на 0.5 пиксела.
+
+<p>Необходимость в субпиксельной точности появляется только из-за того, что
+дисплеи дискретны, состоят из пикселов. Чем меньше становятся пикселы (то
+есть, чем выше разрешение), тем меньше важна эта точность. Однако разницу
+можно почувствовать даже на разрешениях порядка 1280x1024, а тем более при
+обычных для 3D engine 320x200 или 640x480.
+
+<p>Реализовать субпиксельную точность на редкость просто. Представьте себе, что
+мы рисуем грань. Обычно мы начинаем рисовать ее с какого-то нецелого start_y,
+так как при преобразованиях (например, проецировании) у нас получаются вовсе
+не целые числа. Обычно их просто округляют. В результате типичная процедура
+рисования треугольника, которая начинает отрисовку с самой верхней точки A и
+идет вниз по строкам, на каждой строке пересчитывая координаты начала и конца
+рисуемого отрезка как
+
+<pre class=source>
+sx_start += dx_start;
+sx_end += dx_end;
+</pre>
+
+<p>теряет субпиксельную точность из-за этого самого округления, так как sx_start
+инициализируется как A.sx, A.sx соотвествует линии y = A.sy, а рисовать мы
+начинаем с какого-то округленного значения. Кстати, ни один из примеров к
+FAQ'у потерей субпиксельной точности не страдает, так как для каждой строки
+sx_start и sx_end заново вычисляются по точной формуле.
+
+<p>Точная формула для расчета sx_start выглядит как
+
+<p class=expression>sx_start = A.sx + dx_start * (current_sy - A.sy),<br>
+
+<p>и для самой первой линии мы тоже должны ее честно применить, а не просто
+положить sx_start = A.sx. Получаем, что
+
+<pre class=source>
+sx_start = A.sx + dx_start * (ceil(A.sy) - A.sy);
+sx_end = A.sx + dx_end * (ceil(A.sy) - A.sy);
+</pre>
+
+<p>Ту же самую операцию надо сделать и со всем остальными переменными, которые
+мы будем интерполировать по ребрам (например u, v, интенсивность для Гуро);
+и то же самое надо сделать при переходе с ребра на ребро.
+
+<pre class=source>
+// ...
+u_start += du_start * (ceil(start_y) - start_y);
+u_end += du_end * (ceil(start_y) - start_y);
+// ...
+</pre>
+
+<p>Ну и, разумеется, рисовать начинать надо с той строки, которую мы использовали
+в формулах. То есть, ceil(start_y).
+
+<p>Вот и все. На скорость работы это не влияет вообще, а грани сразу перестают
+мелко и противно дрожать при перемещении, особенно сильно это заметно при
+маленьких поворотах (в доли градуса).
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="64.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="72.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

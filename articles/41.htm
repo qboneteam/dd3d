@@ -1,0 +1,212 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Текстурирование. Точное.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b4.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+ТЕКСТУРИРОВАНИЕ<br>4.1. Точное
+
+<!-- Article -->
+
+<p>Задача текстурирования формулируется таким образом: есть грань - согласно
+предположениям, треугольная - с наложенной на нее текстурой. То есть каждая
+точка грани окрашена цветом соответствующей ей точки в текстуре. Текстура
+накладывается линейным образом. Есть точка экрана с координатами на экране
+(sx,sy), принадлежащая проекции грани. Требуется найти ее цвет, то есть
+цвет соответствующей этой точке экрана точки текстуры. А для этого надо
+найти координаты текстуры для этой точки - точнее, для той точки, проекцией
+которой на экран является наша (sx,sy).
+
+<p>Пусть вершины грани есть точки A(Ax,Ay,Az), B(Bx,By,Bz) и C(Cx,Cy,Cz), а
+соответствующие им точки текстуры - (Au,Av), (Bu,Bv) и (Cu,Cv). Найдем
+координаты текстуры для точки, проекцией которой является (sx,sy).
+
+<p>Для точек (x,y,z), проекцией которых является (sx,sy) имеем:
+
+<p class=expression>sx = xSize/2+x*dist/(z+dist),<br>
+sy = ySize/2-y*dist/(z+dist).<br>
+
+<p>Для упрощения формул будем использовать обозначения
+
+<p class=expression>i = sx-XSize/2,<br>
+j = YSize/2-sy,<br>
+Z = z+dist.<br>
+
+<p>Тогда эти формулы примут вид
+
+<p class=expression>i = x*dist/Z,<br>
+j = y*dist/Z,<br>
+
+<p>или, что равносильно:
+
+<p class=expression>i*Z = x*dist,<br>
+j*Z = y*dist.<br>
+
+<p>Рассмотрим точку D, принадлежащую грани. Для нее D = A+a*(B-A)+b*(C-A), так
+как она лежит в грани. D однозначно задается парой (a,b). Для нее координаты
+текстуры (из того, что текстура накладывается линейно) будут такие:
+
+<p class=expression>Du = Au+a*(Bu-Au)+b*(Cu-Au),<br>
+Dv = Av+a*(Bv-Av)+b*(Cv-Av).<br>
+
+<p>Пусть проекция D на экран как раз и имеет координаты (sx,sy), тогда для нее
+выполнены написанные выше соотношения:
+
+<p class=expression>i*DZ = Dx*dist,<br>
+j*DZ = Dy*dist.<br>
+
+<p>Подставим сюда координаты D, выраженные через координаты A, B и неизвестные
+коэффициенты a, b:
+
+<p class=expression>i*(Az+a*(Bz-Az)+b*(Cz-Az)+dist) = dist*(Ax+a*(Bx-Ax)+b*(Cx-Ax)),<br>
+j*(Az+a*(Bz-Az)+b*(Cz-Az)+dist) = dist*(Ay+a*(By-Ay)+b*(Cy-Ay)),<br>
+
+<p>т.к. мы договорились, что AZ = Az+dist, и, кстати, поэтому BZ-AZ = Bz-Az,
+это можно чуть укоротить:
+
+<p class=expression>i*(AZ+a*(BZ-AZ)+b*(CZ-AZ)) = dist*(Ax+a*(Bx-Ax)+b*(Cx-Ax)),<br>
+j*(AZ+a*(BZ-AZ)+b*(CZ-AZ)) = dist*(Ay+a*(By-Ay)+b*(Cy-Ay)).<br>
+
+<p>Выделим a и b:
+
+<p class=expression>a*(i*(BZ-AZ)-dist*(Bx-Ax))+b*(i*(CZ-AZ)-dist*(Cx-Ax)) = dist*Ax-i*AZ,<br>
+a*(j*(BZ-AZ)-dist*(By-Ay))+b*(j*(CZ-AZ)-dist*(Cy-Ay)) = dist*Ay-j*AZ.<br>
+
+<p>Получили систему двух линейных уравнений, из которой можно найти a и b, а
+по ним немедленно вычисляются u и v. Введем вектор M = BA (Mx = Bx-Ax и т.д.)
+и вектор N = CA, обозначим d = dist (все это для краткости записи). Тогда
+эти два уравнения перепишутся в виде:
+
+<p class=expression>a*(i*Mz-d*Mx)+b*(i*Nz-d*Nx) = d*Ax-i*AZ,<br>
+a*(j*Mz-d*My)+b*(j*Nz-d*Ny) = d*Ay-j*AZ,<br>
+
+<p>и решая систему (например, по формулам Крамера) получаем:
+
+<pre class=formula>
+    (dAx-iAZ)(jNz-dNy)-(dAy-jAZ)(iNz-dNx)
+a = ------------------------------------- =
+    (iMz-dMx)(jNz-dNy)-(iNz-dNx)(jMz-dMy)
+
+    djAxNz-ddAxNy-ijAZNz+idAZNy-diAyNz+ddAyNx+ijNzAZ-djAZNx
+  = ------------------------------------------------------- =
+    ijMzNz-idMzNy-djMxNz+ddMxNy-ijMzNz+idNzMy+djNxMz-ddNxMy
+
+    dj(AxNz-AZNx)+dd(AyNx-AxNy)+id(AZNy-AyNz)
+  = ----------------------------------------- =
+    id(MyNz-MzNy)+dj(NxMz-MxNz)+dd(MxNy-NxMy)
+
+    i(AZNy-AyNz)+j(AxNz-AZNx)+d(AyNx-AxNy)
+  = --------------------------------------
+    i(MyNz-MzNy)+j(NxMz-MxNz)+d(MxNy-NxMy)
+</pre>
+
+<p>аналогично получаем
+
+<pre class=formula>
+    i(AZMy-AyMz)+j(AxMz-AZMx)+d(AyMx-AxMy)
+b = --------------------------------------
+    i(MyNz-MzNy)+j(NxMz-MxNz)+d(MxNy-NxMy)
+</pre>
+
+</p>Знаки умножения здесь везде опущены, иначе читать это все совсем невозможно.
+
+<p>Осталось немного, подставить Mx = Bx-Ax и так далее, а потом подставить эти
+a и b в формулы для Du и Dv. В процессе подстановок что-то сократится,
+что-то упростится, но формулы для Du и Dv все равно получатся длиной в
+несколько строк.
+
+<p>Но из этих формул видно кое-что интересное. А именно, то, что
+
+<p class=expression>u = (C1*sx+C2*sy+C3) / (C4*sx+C5*sy+C6),<br>
+v = (C7*sx+C8*sy+C9) / (C4*sx+C5*sy+C6),<br>
+
+<p>причем C1, ..., C9 - просто какие-то коэффициенты, зависящие от грани. То
+есть, можно посчитать эти коэффициенты один раз на грань, а потом считать
+u, v по написанным пару строк выше формулам. Но все равно получается как
+минимум одно деление на точку. Это слишком медленно. Поэтому все методы
+текстурирования на самом деле используют приближенные вычисления, хотя и
+именно по этим формулам.
+
+<p>Стоит отметить тот факт, что на самом деле здесь грань не обязательно
+должна быть треугольной - можно взять любые три вершины многоугольной грани.
+То же самое справедливо и для остальных описанных методов текстурирования.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="36.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="42.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>

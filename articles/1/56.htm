@@ -1,0 +1,200 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Освещение. Как совместить текстуру и освещение.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td>
+
+<p class=title>
+<img src="../img/b5.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+ОСВЕЩЕНИЕ<br>5.6. Как совместить текстуру и освещение
+<div align=justify>
+
+<!-- Article -->
+
+<p>Прежде всего, немного теории. Нам понадобится знать то, что конечный цвет
+пиксела с составляющими (r,g,b) и освещенного цветом (light_r,light_g,light_b)
+считается как
+
+<p class=expression>result_r = r * light_r / max(light_r);<br>
+result_g = g * light_g / max(light_g);<br>
+result_b = b * light_b / max(light_b);<br>
+
+<p>Здесь max(light_r) - это максимально возможное значение для light_r. Не
+максимальное по всем тем градациям освещенности, что мы используем, а вообще
+максимальное для всех возможных градаций. Например, если у нас значения для
+light_r могут гулять от 0 до 255, а текущий источник света имеет цвет (30,
+40,50), то соответственно градации освещенности будут равны (k*30,k*40,k*50),
+где 0 <= k <= 1, то max(light_r) = 255, а не 30. Немного путаное объяснение,
+но вообще это известная и понятная почти всем вещь.
+
+<a name="561"></a>
+<p class=title><img src="../img/b5.gif" width=70 height=70 align=left hspace=0 alt=""><img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">5.6.1. 256-цветные режимы
+
+<p>Метод 1: заранее посчитать таблицу, переводящую пару (цвет, освещенность) в
+цвет. Можно не менять палитру, а искать для каждой пары (цвет, освещенность)
+наилучшим образом приближающий ее цвет; а можно (как описано в demo.design
+FAQ) взять палитру и сгенерировать из нее true color картинку 256x256, в
+которой пиксел (x, y) нарисован цветом (уже true color!), соответствующим
+цвету x и освещенности y, а потом перевести ее чем-нибудь типа Image Alchemy
+в 256 цветов. После чего использовать палитру получившейся картинки, а в
+качестве таблицы (colorTable) будет сама получившаяся картинка:
+
+<p class=expression>outputColor = colorTable[intensity][color].<br>
+
+<p>Метод 2: если нас устроит использовать немного цветов и градаций освещения,
+то тогда в палитру можно впихнуть все возможные градации всех используемых
+цветов. Тогда определение нужного индекса в палитре - это одно умножение,
+а лучше - сдвиг, и одно сложение. Пример: пусть у нас есть 8 цветов и 32
+градации освещенности. Палитру заполняем так: 32 градации первого цвета,
+второго, ..., восьмого. Тогда (для этого примера)
+
+<p class=expression>outputColor = (color << 5) + intensity.<br>
+
+<a name="562"></a>
+<p class=title><img src="../img/b5.gif" width=70 height=70 align=left hspace=0 alt=""><img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">5.6.2. 24/32-битные режимы
+
+<p>Здесь все делается теми же самыми таблицами. Только таблица переводит не
+цвет в цвет, а компоненту цвета в компоненту цвета. То есть, создаем
+таблицы redTable[numShades], greenTable[numShades], blueTable[numShades],
+а потом для каждой компоненты каждого пиксела и нужной градации освещенности
+по этой таблице определяем выходное значение компоненты:
+
+<p class=expression>r = redTable[intensity],<br>
+g = greenTable[intensity],<br>
+b = blueTable[intensity].<br>
+
+<p>Каждая компонента в этих режимах - это отдельный байт, поэтому никаких
+проблем не возникает.
+
+<a name="563"></a>
+<p class=title><img src="../img/b5.gif" width=70 height=70 align=left hspace=0 alt=""><img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">5.6.3. 15/16-битные режимы
+
+<p>Метод 1: тупой, но действенный. Использовать большую таблицу и занести в нее
+все возможные комбинации цвета и градации освещения. Таблица получится совсем
+не маленькая, размером 65536*32 = 2 мегабайта. Я написал здесь 32, потому как
+в этих режимах на компоненту отводится по 5 бит (за исключением 6-битной
+зеленой компоненты в 16-битном режим), и делать больше градаций освещенности,
+чем 32, бессмысленно.
+
+<p>Метод 2: делать все так же, как в 24/32-битных режимах. Проблемы возникнут
+из-за того, что придется с муками выдирать нужные несколько бит компоненты
+из пиксела. Таблицы для компонент лучше заранее сделать со всеми нужными
+сдвигами, т.е. значения элементов таблиц должны быть такого вида:
+
+<pre class=formula>
+000bbbbb          - синий, 8 бит
+00000gggggg00000  - зеленый, 16 бит
+rrrrr000          - красный, 8 бит
+</pre>
+
+<p>Тогда конечный цвет считается примерно так:
+
+<pre class=source>
+outputColor =
+   (redTable[(color >> 10) & 0x2F] << 8) +
+  greenTable[(color >> 5) & 0x1F] +
+   blueTable[color & 0x1F].
+</pre>
+
+<p>На ассемблере это делается, видимо, побыстрее - и покрасивее. Примерно так:
+
+<pre class=source>
+; ...
+mov  bx,color
+shr  bx,10
+and  bx,02Fh
+mov  ah,redTable[bx]
+mov  bx,color
+and  bx,01Fh
+mov  al,blueTable[bx]
+mov  bx,color
+shr  bx,5      ; можно заменить на
+and  bx,01Fh   ;   shr  bx,4
+shl  bx,1      ;   and  bx,02Eh
+or   ax,greenTable[bx]
+mov  outputColor,ax
+; ...
+</pre>
+
+<p>Метод 3: рисовать все в 24/32-бита, освещение соответсвенно с текстурой
+совмещать по пункту <a href="#562">5.6.2</a>, а потом непосредственно при выводе на экран делать
+преобразование из 24/32-бит в 15/16. Или использовать PTC и предоставить
+делать нужное преобразование именно ему. PTC - это такая графическая система
+для C++, взять ее можно на <a href="http://www.gaffer.org/ptc/">http://www.gaffer.org/ptc</a>.
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="55.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="61.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+</center></body>
+</html>

@@ -1,0 +1,388 @@
+<!--
+	demo.design 3D programming FAQ
+
+	Idea, texts, screenshots:
+		Andrew A. Aksyonoff,
+		shodan@chat.ru
+
+	Web-design, illustrations:
+		Andrey Samoilov,
+		asy@sense.simbirsk.su
+-->
+
+<html>
+<head>
+<title>demo.design 3D programming FAQ. Оптимизация. Тайловые текстуры.</title>
+<link rel=stylesheet href="../style.css" type="text/css">
+</head>
+
+<script language="javascript">
+<!--//
+browser = navigator.appName;
+version = parseFloat(navigator.appVersion);
+if (browser == "Netscape" && version >= 3.0) { jsenabled = 1; } else
+if (browser == "Microsoft Internet Explorer" && version >= 3.0) { jsenabled = 1; } else { jsenabled = 0; }
+
+function swap(img,ref) { if (jsenabled) {document.images[img].src = ref;} }
+function loadtocache(img,ref) { cache[img] = new Image(); cache[img].src = ref; }
+
+if (jsenabled) {
+cache = new Array();
+loadtocache(0,"../img/xdl.gif");
+loadtocache(1,"../img/xfaq.gif");
+loadtocache(2,"../img/xlinks.gif");
+loadtocache(3,"../img/xauthor.gif");
+loadtocache(4,"../img/xe.gif");
+loadtocache(5,"../img/xprev.gif");
+loadtocache(6,"../img/xnext.gif");}
+//-->
+</script>
+
+<body bgcolor=white><center>
+
+<!-- Title -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo','../img/xe.gif');" onmouseout="swap('logo','../img/e.gif');"><img src="../img/e.gif" name=logo width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="../download.htm" onmouseover="swap('dl','../img/xdl.gif');" onmouseout="swap('dl','../img/dl.gif');"><img src="../img/dl.gif" name=dl width=40 height=40 border=0 hspace=5 alt=" download "></a><br>download</td>
+<td align=center><p class=navy><a href="../links.htm" onmouseover="swap('links','../img/xlinks.gif');" onmouseout="swap('links','../img/links.gif');"><img src="../img/links.gif" name=links width=40 height=40 border=0 hspace=5 alt=" коллекция линков "></a><br>links</td>
+<td align=center><p class=navy><a href="../author.htm"  onmouseover="swap('author','../img/xauthor.gif');" onmouseout="swap('author','../img/author.gif');"><img src="../img/author.gif" name=author width=40 height=40 border=0 hspace=5 alt=" автора! "></a><br>author</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br><img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+<!-- Head -->
+
+<table width=500 cellpadding=0 cellspacing=10 border=0><td><div align=justify>
+
+<p class=title>
+<img src="../img/b6.gif" width=70 height=70 align=left hspace=0 alt="">
+<img src="../img/t.gif" width=5 height=70 align=left hspace=0 alt="">
+ОПТИМИЗАЦИЯ<br>6.4. Тайловые текстуры
+
+<!-- Article -->
+
+<p>В пункте <a href="61.htm#612">6.1.2.</a> кратко описана схема работы кэш-памяти для процессоров Intel
+Pentium. Из этой схемы, в частности, видно, что при непоследовательном
+чтении из памяти будут периодически случаться кэш-промахи, что не очень
+хорошо влияет на скорость. Хрестоматийный пример - это поворачивающаяся
+картинка; при угле поворота, равном 0, чтение из памяти последовательно и
+ситуация с кэшированием идеальна; если мы читаем байт и получаем кэш-промах,
+то следующий за ним 31 байт будет прочитан уже из L1 cache, по полтакта на
+чтение. А при достаточно больших углах поворота, например, 90 градусов,
+каждый следующий байт находится на достаточном расстоянии от предыдущего,
+и получаем кэш-промах практически на каждом пикселе, что *очень* медленно.
+Но эта же ситуация постоянно случается и при текстурировании, грани ведь у
+нас ориентированы произвольным образом, камера - тоже. Тайловые текстуры как
+раз и призваны бороться с кэш-промахами.
+
+<p>Идея такова. Обычно текстура хранится в памяти построчно, именно из-за этого
+при движении вдоль строки все нормально, а при движении поперек строк будут
+постоянные кэш-промахи (кэшируется ведь небольшой горизонтальный кусочек).
+Разобьем ее на маленькие кусочки - тайлы, и будем хранить такими кусочками.
+Вот пример для текстуры размера 256x256 и тайла размера 8x8:
+
+<pre class=formula>
+Текстура в пикселах:
+     0,   1,  2,    3, ..., 255
+   256, 257, 258, 259, ..., 511
+   512, 512, 513, 514, ..., 767
+   ...
+
+Текстура в тайлах:
+   0,  1,  2,  3, ..., 31 (первые восемь строк пикселов)
+  32, 33, 34, 35, ..., 63 (вторые восемь строк пикселов)
+  64, 65, 67, 68, ..., 95
+  ...
+
+Тайл 0 в пикселах:          Тайл 1 в пикселах:
+     0,    1, ...,    7          8,    9, ...,   15
+   256,  257, ...,  263        264,  265, ...,  271
+   512,  513, ...,  519        520,  521, ...,  527
+   ...                         ...
+  1792, 1793, ..., 1799       1800, 1801, ..., 1807
+</pre>
+
+<p>В этом случае все близкие к текущему текселы почти наверняка находятся в
+текущем тайле, и количество кэш-промахов хоть как-то, да уменьшается. То
+есть, тайлы как бы позволяют двигаться в текстуре и по горизонтали, и по
+вертикали. Зато изменяется код расчета смещения нужного пиксела в текстуре.
+Посмотрим, что получится для случая на иллюстрации. Пусть координаты в
+текстуре (то есть, их целые части) равны u, v; тогда номер нужного тайла
+равен (v / 8) * 32 + (u / 8), а координаты в тайле равны (u % 8), (v % 8)
+соответственно. Тут помогает то, что 8 - степень двойки, получается, что
+номер и координаты в тайле можно посчитать и проще, а по ним находим и
+смещение в текстуре:
+
+<pre class=source>
+tile_number = ((v >> 3) << 5) + (u >> 3);
+tile_u = u & 0x07;
+tile_v = v & 0x07;
+texture_offset = (tile_number << 6) + (tile_v << 3) + tile_u;
+</pre>
+
+<p>Напишем эти формулы и для общего случая, то есть для текстуры размером
+(2^TEXBITS)x(2^TEXBITS) и тайла размером (2^TILEBITS)x(2^TILEBITS):
+
+<pre class=source>
+TILEMASK = ((1 << TILEBITS) - 1);
+tile_number = ((v >> TILEBITS) << (TEXBITS - TILEBITS)) +
+  (u >> TILEBITS);
+tile_u = u & TILEMASK;
+tile_v = v & TILEMASK;
+texture_offset = (tile_number << (2*TILEBITS)) +
+  (tile_v << TILEBITS) + tile_u;
+</pre>
+
+<p>Делать такое преобразование для каждого пиксела текстуры - занятие довольно
+небыстрое. Поэтому начинаем заниматься оптимизацией. Выделяем части смещения,
+зависящие от целых частей u, v соответственно:
+
+<pre class=source>
+tile_u_part = ((u >> TILEBITS) << (2*TILEBITS)) +
+  (u & TILEMASK);
+tile_v_part = ((v >> TILEBITS) << (TEXBITS + TILEBITS) +
+  ((v & TILEMASK) << TILEBITS);
+texture_offset = tile_u_part + tile_v_part;
+</pre>
+
+<p>Отсюда видно, что биты целой части u, v разделяются на две группы (нижние
+TILEBITS и все остальные) и эти две группы как-то раскидываются, сдвигаются.
+Посмотрим, как именно это происходит для конкретного случая, где u, v - 8:16
+fixedpoint, TILEBITS = 3, TEXBITS = 8:
+
+<pre class=formula>
+u             00000000 UUUUUuuu ffffffff ffffffff
+v             00000000 VVVVVvvv ffffffff ffffffff
+tile_u_part   00000UUU UU000uuu ffffffff ffffffff
+tile_v_part   VVVVV000 00vvv000 ffffffff ffffffff
+</pre>
+
+<p>Идея быстрого тайлового текстурирования заключается как раз в интерполяции
+непосредственно tile_u_part и tile_v_part, а не u, v; мы заранее переставляем
+биты u, v, du, dv нужным образом и интерполируем уже готовые к использованию
+с тайловыми текстурами величины tile_u_part, tile_v_part. Но для того, чтобы
+сложение давало правильный результат, "дырки" между кусками целой части и
+дробной частью u, v в tile_u_part, tile_v_part надо перед каждым сложением
+заполнять единицами; иначе, скажем, целая единица, получившаяся при сложении
+v и dv уйдет в нижний бит целой части tile_v_part и вместо перехода на пиксел
+вниз вызовет переход на пиксел вправо. Поэтому все должно выглядеть так:
+
+<pre class=formula>
+u             00000000 UUUUUuuu ffffffff ffffffff
+v             00000000 VVVVVvvv ffffffff ffffffff
+tile_u_part   00000UUU UU111uuu ffffffff ffffffff
+tile_v_part   VVVVV111 11vvv111 ffffffff ffffffff
+</pre>
+
+<p>Теперь переносы при сложении будут обрабатываться правильно, при переносе все
+эти единички обнуляются, а переносимый бит добавляется туда, куда надо. Зато
+теперь не будет работать сложение, не вызывающее переноса - в этом случае
+единички останутся на месте и испортят все смещение. Получается, что перед
+сложением нужно выставлять нужные биты в единичку, а после сложения их же и
+очищать. Соответствующий цикл будет выглядеть так:
+
+<pre class=source>
+// ...
+u = make_tile_u(u);
+v = make_tile_v(v);
+du = make_tile_u(du);
+dv = make_tile_v(dv);
+for (current_sx = x_start; current_sx <= x_end; current_sx++) {
+  putpixel(current_sx, current_sy, texture[unfix(u) + unfix(v)];
+  u |= TILE_U_MASK;
+  v |= TILE_V_MASK;
+  u += du;
+  v += dv;
+  u &= (~TILE_U_MASK);
+  v &= (~TILE_U_MASK);
+}
+// ...
+</pre>
+
+<p>Здесь make_tile_u(), make_tile_v() осуществляет перевод u, v в "тайловую"
+форму; unfix() просто сдвигает u, v на собственную дробную часть, оставляя
+лишь целую, TILE_U_MASK, TILE_V_MASK заполняют нужные биты числа единичками.
+В нашем примере видно, что
+
+<pre class= source>
+TILE_U_MASK = 0x380000; // 00000000 00111000 00000000 00000000
+TILE_V_MASK = 0x7C3000; // 00000111 11000111 00000000 00000000
+</pre>
+
+<p>По сравнению с обычным текстурированием добавилось более четырех инструкций.
+Много. Смотрим дальше. С той же самой целью - заставить биты "перепрыгивать
+дырки" при сложении - можно не заполнять дырки единичками в u, v для каждой
+точки, а сделать это один раз для du, dv. Кроме того, unfix() можно делать
+один раз, а не два, заменив (unfix(u) + unfix(v)) на unfix(u + v). Но здесь
+надо проследить за тем, чтобы дробные части u, v при сложении не вызвали бы
+переноса и не испортили смещение на единичку. Достигается это использованием
+fixedpoint 8:15 и вставкой одного запасного бита между целой и дробной частью
+u, v. Т.о., битовые раскладки для нашего примера теперь выглядят вот так:
+
+<pre class=formula>
+tile_u_part   00000UUU UU000uuu 0fffffff ffffffff
+tile_v_part   VVVVV000 00vvv000 0fffffff ffffffff
+tile_du       00000UUU UU111uuu 1fffffff ffffffff
+tile_dv       VVVVV111 11vvv111 1fffffff ffffffff
+TILE_U_MASK   00000000 00111000 10000000 00000000
+TILE_V_MASK   00000111 11000111 10000000 00000000
+</pre>
+
+<p>А окончательная версия цикла выглядит вот так:
+
+<pre class=source>
+// ...
+u = make_tile_u(u);
+v = make_tile_v(v);
+du = make_tile_u(du) | TILE_U_MASK;
+dv = make_tile_v(dv) | TILE_V_MASK;
+for (current_sx = x_start; current_sx <= x_end; current_sx++) {
+  putpixel(current_sx, current_sy, texture[unfix(u + v)];
+  u += du;
+  v += dv;
+  u &= (~TILE_U_MASK);
+  v &= (~TILE_V_MASK);
+}
+// ...
+</pre>
+
+<p>В переводе на ассемблер, заимствованном из все того же <a href="ftp://ftp.hornet.org/pub/demos/code/3d/trifill/texmap/fatmap2.zip">fatmap2.txt</a>, все это
+выглядит вот так:
+
+<pre class=source>
+    mov eax,tile_u_part
+    mov ebx,tile_v_part
+    mov ecx,length
+    mov esi,texture
+    mov edi,outputbuffer
+
+    lea edi,[edi+ecx-1]
+    xor ecx,-1
+    lea ebp,[eax+ebx]
+    inc ecx
+inner:
+    add eax,tile_du
+    add ebx,tile_dv
+    shr ebp,16
+    and eax,11111111110001110111111111111111b ; (~TILE_U_MASK)
+    and ebx,11111000001110000111111111111111b ; (~TILE_V_MASK)
+    inc ecx
+    mov dl,[esi+ebp]
+    lea ebp,[eax+ebx]
+    mov [edi+ecx],dl
+    jnz inner
+</pre>
+
+<p>Осталось упомянуть про то, что тайлы можно расположить не по горизонтали,
+а по вертикали:
+
+<pre class=formula>
+Текстура в тайлах:
+  0, 32, 64, ...
+  1, 33, 65, ...
+  2, 34, 66, ...
+  ...
+</pre>
+
+<p>Тогда преобразование для целых частей u, v выглядит следующим образом:
+
+<pre class=source>
+tile_number = ((u >> TILEBITS) << (TEXBITS - TILEBITS)) +
+  (v >> TILEBITS);
+tile_u = u & TILEMASK;
+tile_v = v & TILEMASK;
+texture_offset = (tile_number << (2*TILEBITS)) +
+  (tile_v << TILEBITS) + tile_u;
+</pre>
+
+<p>Выделяя u, v, получаем:
+
+<pre class=source>
+tile_u_part = ((u >> TILEBITS) << (TEXBITS + TILEBITS) +
+  (u & TILEMASK);
+tile_v_part = ((v >> TILEBITS) << TILEBITS) +
+               ((v & TILEMASK) << TILEBITS);
+</pre>
+
+<p>то есть
+
+<pre class=source>
+tile_u_part = ((u >> TILEBITS) << (TEXBITS + TILEBITS) +
+  (u & TILEMASK);
+tile_v_part = v << TILEBITS;
+</pre>
+
+<p>Все это делается для единственной цели - скорости. В таком виде перевод u, v
+в "тайловые координаты" делается немного проще и быстрее; внутрениий цикл же
+остается таким же (ну, константы (~TILE_U_MASK) и (~TILE_V_MASK), конечно,
+поменять придется, но это непринципиально). Здесь битовая раскладка выглядит
+следующим образом:
+
+<pre class=formula>
+tile_u_part   UUUUU000 00000uuu 0fffffff ffffffff
+tile_v_part   00000VVV VVVVV000 0fffffff ffffffff
+tile_du       UUUUU111 11111uuu 1fffffff ffffffff
+tile_dv       00000VVV VVVVV111 1fffffff ffffffff
+TILE_U_MASK   00000111 11111000 10000000 00000000
+TILE_V_MASK   00000000 00000111 10000000 00000000
+</pre>
+
+<p>Полные формулы (функции) для перевода из 16:16 fixedpoint в "тайловый" 8:15
+fixedpoint приведем именно для этого случая; выглядят они вот так:
+
+<pre class=source>
+int make_tile_u(int u) {
+  return
+    ((u << 8) & 0xF8000000) +
+     (u       & 0x70000) +
+     ((u >> 1) & 0x7FFF);
+}
+
+int make_tile_v(int u) {
+  return
+    ((v << 3) & 0x7F80000) +
+    ((v >> 1) & 0x7FFF);
+}
+</pre>
+
+<p>Для полной комплектности осталось только привести кусочек кода для перевода
+обычной текстуры в тайловую форму (для случая текстуры 256x256, тайла 8x8,
+"вертикального" расположения тайлов).
+
+<pre class=source>
+void tile_texture(char *dst, char *src) {
+  int u, v;
+
+  for (v = 0; v < 256; v++)
+    for (u = 0; u < 256; u++)
+      dst[((u << 8) & 0xF800) + (u & 0x7) +
+          ((v << 3) & 0x7F8)] = *src++;
+}
+</pre>
+
+</div>
+</td></table>
+
+<!-- Bottom Navigation -->
+
+<img src="../img/b.gif" width=500 height=1 alt=""><br><img src="../img/t.gif" width=500 height=2 alt=""><br>
+<table width=500 cellpadding=0 cellspacing=0 border=0>
+<td><img src="../img/t.gif" width=5 height=1 alt=""><a href="../main.htm" onmouseover="swap('logo2','../img/xe.gif');" onmouseout="swap('logo2','../img/e.gif');"><img src="../img/e.gif" name=logo2 width=60 height=50 hspace=10 border=0 alt=" в самое начало "></a></td>
+<td><p class=pagetitle><img src="../img/t.gif" width=265 height=1 alt=""><br>demo.design<br>3D programming FAQ</td>
+<td align=center><p class=navy><a href="63.htm" onmouseover="swap('prev','../img/xprev.gif');" onmouseout="swap('prev','../img/prev.gif');"><img src="../img/prev.gif" name=prev width=40 height=40 border=0 hspace=5 alt=" предыдущая статья "></a><br>previous</td>
+<td align=center><p class=navy><a href="../content.htm" onmouseover="swap('faq','../img/xfaq.gif');" onmouseout="swap('faq','../img/faq.gif');"><img src="../img/faq.gif" name=faq width=40 height=40 border=0 hspace=5 alt=" содержание "></a><br>content</td>
+<td align=center><p class=navy><a href="71.htm" onmouseover="swap('next','../img/xnext.gif');" onmouseout="swap('next','../img/next.gif');"><img src="../img/next.gif" name=next width=40 height=40 border=0 hspace=5 alt=" следующая статья "></a><br>next</td>
+</table>
+<img src="../img/t.gif" width=500 height=4 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+<img src="../img/t.gif" width=500 height=1 alt=""><br>
+<img src="../img/b.gif" width=500 height=1 alt=""><br>
+
+
+</center></body>
+</html>
